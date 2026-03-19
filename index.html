@@ -5,47 +5,30 @@
 <link rel="icon" type="image/png" href="logo.jpg">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BerBeck — Pedidos de Chopp</title>
-
-<!-- Playfair Display = serifada pesada para headers / Barlow Condensed = subtítulo estilo cervejaria -->
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
-/* ═══════════════════════════════════════════════
-   TOKENS — cores extraídas direto da logo BerBeck
-   ═══════════════════════════════════════════════ */
 :root {
-  /* Brand */
-  --gold:          #C9A84C;   /* dourado principal — corpo da logo */
-  --gold-light:    #DFC278;   /* highlight */
-  --gold-dim:      #A8893C;   /* hover/active */
-  --gold-muted:    #6B5520;   /* texto fraco / borders */
+  --gold:          #C9A84C;
+  --gold-light:    #DFC278;
+  --gold-dim:      #A8893C;
+  --gold-muted:    #6B5520;
   --gold-faint:    rgba(201,168,76,0.12);
-
-  /* Backgrounds — preto quente como o fundo da logo */
   --bg:            #0A0A08;
   --bg-1:          #100F0C;
   --bg-2:          #171510;
   --bg-3:          #1F1C14;
   --bg-4:          #28231A;
-
-  /* Text */
-  --text:          #EDE5CC;   /* creme — cor da tipografia "CERVEJARIA ARTESANAL" */
+  --text:          #EDE5CC;
   --text-muted:    #7A6840;
-
-  /* Status */
   --green:         #6BBF7A;
   --blue:          #6AAAD4;
   --red:           #D4614A;
   --orange:        #D4904A;
   --purple:        #9B7FD4;
-
-  /* Misc */
   --border:        rgba(201,168,76,0.15);
   --border-strong: rgba(201,168,76,0.35);
   --card:          rgba(23,21,16,0.95);
-
-  /* Typo */
   --font-display: 'Playfair Display', Georgia, serif;
   --font-label:   'Barlow Condensed', sans-serif;
   --font-body:    'Barlow', sans-serif;
@@ -58,62 +41,30 @@ body {
   color: var(--text);
   font-family: var(--font-body);
   min-height: 100vh;
-  /* Subtle texture — radial grain pattern */
   background-image:
     radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201,168,76,0.06) 0%, transparent 60%),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
 }
 
-/* ═══════════════════════════════════════════════
-   HEADER
-   ═══════════════════════════════════════════════ */
+/* ── HEADER ── */
 header {
   position: sticky; top: 0; z-index: 50;
   background: var(--bg-1);
   border-bottom: 1px solid var(--border-strong);
-  /* Subtle top gold line */
   box-shadow: 0 -3px 0 0 var(--gold) inset, 0 4px 40px rgba(0,0,0,0.8);
-  padding: 0 28px;
-  height: 68px;
+  padding: 0 28px; height: 68px;
   display: flex; align-items: center; justify-content: space-between;
 }
-
-/* Logo SVG-text styled to match brand */
-.logo {
-  display: flex; align-items: center; gap: 14px;
-}
-
-.logo-wordmark {
-  display: flex; flex-direction: column; line-height: 1;
-}
-
+.logo { display: flex; align-items: center; gap: 14px; }
+.logo-wordmark { display: flex; flex-direction: column; line-height: 1; }
 .logo-name {
-  font-family: var(--font-display);
-  font-weight: 900;
-  font-size: 28px;
-  letter-spacing: 3px;
-  /* Gradient matches the aged-gold of the actual logo */
+  font-family: var(--font-display); font-weight: 900; font-size: 28px; letter-spacing: 3px;
   background: linear-gradient(160deg, var(--gold-light) 0%, var(--gold) 45%, var(--gold-dim) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
   text-transform: uppercase;
 }
-
-.logo-sub {
-  font-family: var(--font-label);
-  font-weight: 600;
-  font-size: 9px;
-  letter-spacing: 4px;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  margin-top: 3px;
-}
-
-.header-right {
-  display: flex; align-items: center; gap: 16px;
-}
-
+.logo-sub { font-family: var(--font-label); font-weight: 600; font-size: 9px; letter-spacing: 4px; color: var(--text-muted); text-transform: uppercase; margin-top: 3px; }
+.header-right { display: flex; align-items: center; gap: 16px; }
 .conn-pill {
   display: flex; align-items: center; gap: 7px;
   background: var(--bg-3); border: 1px solid var(--border);
@@ -122,117 +73,126 @@ header {
   color: var(--text-muted); transition: border-color .3s, color .3s;
 }
 .conn-pill.online  { border-color: rgba(107,191,122,0.4); color: var(--green); }
-.conn-pill.offline { border-color: rgba(212,97,74,0.4);  color: var(--red); }
-
-.conn-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: currentColor;
-}
+.conn-pill.offline { border-color: rgba(212,97,74,0.4);   color: var(--red); }
+.conn-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 .conn-pill.online  .conn-dot { box-shadow: 0 0 6px var(--green); }
 .conn-pill.offline .conn-dot { box-shadow: 0 0 6px var(--red); }
-
-.header-month {
-  font-family: var(--font-label);
-  letter-spacing: 1px; text-align: right;
-}
+.header-month { font-family: var(--font-label); letter-spacing: 1px; text-align: right; }
 .header-month strong { display: block; color: var(--gold-light); font-size: 14px; font-weight: 700; }
 .header-month span   { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; }
 
-/* ═══════════════════════════════════════════════
-   MAIN
-   ═══════════════════════════════════════════════ */
+/* ── MAIN ── */
 main { max-width: 1200px; margin: 0 auto; padding: 32px 20px 80px; }
 
-/* ═══════════════════════════════════════════════
-   SECTION LABEL — estilo "CERVEJARIA ARTESANAL"
-   ═══════════════════════════════════════════════ */
+/* ── EYEBROW ── */
 .eyebrow {
-  font-family: var(--font-label);
-  font-size: 10px; font-weight: 700;
-  letter-spacing: 4px; text-transform: uppercase;
-  color: var(--text-muted);
-  display: flex; align-items: center; gap: 10px;
-  margin-bottom: 16px;
+  font-family: var(--font-label); font-size: 10px; font-weight: 700;
+  letter-spacing: 4px; text-transform: uppercase; color: var(--text-muted);
+  display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
 }
-.eyebrow::before, .eyebrow::after {
-  content: '';
-  flex: 1; height: 1px;
-  background: linear-gradient(90deg, transparent, var(--border-strong));
-}
-.eyebrow::before { background: linear-gradient(90deg, var(--border-strong), transparent); }
+.eyebrow::before { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-strong), transparent); }
+.eyebrow::after  { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--border-strong)); }
 
-/* ═══════════════════════════════════════════════
-   STATS
-   ═══════════════════════════════════════════════ */
-.stats {
-  display: grid; grid-template-columns: repeat(5, 1fr);
-  gap: 10px; margin-bottom: 36px;
-}
-
-.stat {
+/* ── ESTOQUE BANNER ── */
+.estoque-wrap {
   background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 18px 14px 14px;
-  text-align: center;
-  position: relative; overflow: hidden;
-  transition: border-color .2s, transform .2s;
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 0;
+  align-items: center;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  position: relative;
+  overflow: hidden;
+}
+.estoque-wrap::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
 }
 
+.est-block { padding: 0 20px; }
+.est-block:first-child { padding-left: 0; }
+.est-block + .est-block { border-left: 1px solid var(--border); }
+
+.est-label {
+  font-family: var(--font-label); font-size: 9px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 2.5px; color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.est-val {
+  font-family: var(--font-display); font-weight: 900; font-size: 38px; line-height: 1;
+  background: linear-gradient(160deg, var(--gold-light), var(--gold));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.est-val.danger {
+  background: linear-gradient(160deg, #F08060, var(--red));
+  -webkit-background-clip: text; background-clip: text;
+}
+.est-val.warn {
+  background: linear-gradient(160deg, #F0C060, var(--orange));
+  -webkit-background-clip: text; background-clip: text;
+}
+.est-val.safe {
+  background: linear-gradient(160deg, #90D4A0, var(--green));
+  -webkit-background-clip: text; background-clip: text;
+}
+.est-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; font-family: var(--font-label); letter-spacing: 0.5px; }
+
+/* Estoque bar */
+.est-bar-wrap { margin-top: 10px; }
+.est-bar-track {
+  height: 4px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden;
+}
+.est-bar-fill {
+  height: 100%; border-radius: 4px;
+  background: linear-gradient(90deg, var(--gold-dim), var(--gold-light));
+  transition: width .6s ease;
+}
+.est-bar-fill.danger { background: linear-gradient(90deg, #B03020, var(--red)); }
+.est-bar-fill.warn   { background: linear-gradient(90deg, #B07020, var(--orange)); }
+
+.est-action { padding-left: 24px; }
+
+/* ── STATS ── */
+.stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 36px; }
+.stat {
+  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+  padding: 18px 14px 14px; text-align: center;
+  position: relative; overflow: hidden; transition: border-color .2s, transform .2s;
+}
 .stat::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0;
-  height: 2px;
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
   background: linear-gradient(90deg, transparent, var(--gold), transparent);
   opacity: 0; transition: opacity .2s;
 }
 .stat:hover { border-color: var(--border-strong); transform: translateY(-2px); }
 .stat:hover::before { opacity: 1; }
-
 .stat-val {
-  font-family: var(--font-display);
-  font-weight: 900; font-size: 34px; line-height: 1;
+  font-family: var(--font-display); font-weight: 900; font-size: 34px; line-height: 1;
   background: linear-gradient(160deg, var(--gold-light), var(--gold));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
-.stat-val.warn {
-  background: linear-gradient(160deg, #F0A860, var(--orange));
-  -webkit-background-clip: text; background-clip: text;
-}
-.stat-lbl {
-  font-family: var(--font-label);
-  font-size: 9px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 2px;
-  color: var(--text-muted); margin-top: 6px;
-}
+.stat-val.warn { background: linear-gradient(160deg, #F0A860, var(--orange)); -webkit-background-clip: text; background-clip: text; }
+.stat-lbl { font-family: var(--font-label); font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-top: 6px; }
 
-/* ═══════════════════════════════════════════════
-   TOOLBAR
-   ═══════════════════════════════════════════════ */
-.toolbar {
-  display: flex; align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap; gap: 12px; margin-bottom: 16px;
-}
-
+/* ── TOOLBAR ── */
+.toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
 .section-title {
-  font-family: var(--font-display);
-  font-size: 20px; font-weight: 700;
+  font-family: var(--font-display); font-size: 20px; font-weight: 700;
   background: linear-gradient(120deg, var(--gold-light), var(--gold));
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
 
-/* ═══════════════════════════════════════════════
-   BUTTONS
-   ═══════════════════════════════════════════════ */
+/* ── BUTTONS ── */
 .btn {
   background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 60%, var(--gold-dim) 100%);
-  color: var(--bg);
-  border: none; border-radius: 6px;
-  padding: 10px 22px;
-  font-family: var(--font-label); font-weight: 700;
-  font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase;
-  cursor: pointer;
+  color: var(--bg); border: none; border-radius: 6px; padding: 10px 22px;
+  font-family: var(--font-label); font-weight: 700; font-size: 13px;
+  letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
   display: inline-flex; align-items: center; gap: 7px;
   transition: filter .15s, transform .1s;
   box-shadow: 0 2px 12px rgba(201,168,76,0.2);
@@ -240,281 +200,158 @@ main { max-width: 1200px; margin: 0 auto; padding: 32px 20px 80px; }
 .btn:hover   { filter: brightness(1.1); }
 .btn:active  { transform: scale(.97); }
 .btn:disabled { opacity: .4; cursor: not-allowed; }
-
-.btn-ghost {
-  background: transparent;
-  border: 1px solid var(--border-strong);
-  color: var(--gold);
-  box-shadow: none;
-}
+.btn-ghost { background: transparent; border: 1px solid var(--border-strong); color: var(--gold); box-shadow: none; }
 .btn-ghost:hover { background: var(--gold-faint); filter: none; }
-
 .btn-sm { padding: 5px 12px; font-size: 11px; letter-spacing: 1px; border-radius: 5px; }
 .btn-danger { background: linear-gradient(135deg, #E07060, var(--red)); color: #fff; box-shadow: none; }
 .btn-danger:hover { filter: brightness(1.1); }
 
-/* ═══════════════════════════════════════════════
-   FILTER CHIPS
-   ═══════════════════════════════════════════════ */
-.filters {
-  display: flex; gap: 8px; flex-wrap: wrap;
-  align-items: center; margin-bottom: 16px;
-}
-
+/* ── FILTERS ── */
+.filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
 .chip {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-muted); border-radius: 4px;
-  padding: 5px 14px;
-  font-family: var(--font-label); font-size: 12px;
-  font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
-  cursor: pointer; transition: all .15s;
+  background: transparent; border: 1px solid var(--border); color: var(--text-muted);
+  border-radius: 4px; padding: 5px 14px; font-family: var(--font-label); font-size: 12px;
+  font-weight: 600; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all .15s;
 }
 .chip:hover  { border-color: var(--gold-muted); color: var(--text); }
-.chip.active {
-  background: linear-gradient(135deg, var(--gold-light), var(--gold-dim));
-  border-color: transparent; color: var(--bg); font-weight: 700;
-}
-
+.chip.active { background: linear-gradient(135deg, var(--gold-light), var(--gold-dim)); border-color: transparent; color: var(--bg); font-weight: 700; }
 .search {
-  background: var(--bg-2);
-  border: 1px solid var(--border);
-  border-radius: 6px; padding: 7px 13px;
-  color: var(--text); font-family: var(--font-body); font-size: 13px;
+  background: var(--bg-2); border: 1px solid var(--border); border-radius: 6px;
+  padding: 7px 13px; color: var(--text); font-family: var(--font-body); font-size: 13px;
   width: 200px; transition: border-color .2s;
 }
 .search:focus { outline: none; border-color: var(--gold-muted); }
 .search::placeholder { color: var(--text-muted); }
 
-/* ═══════════════════════════════════════════════
-   TABLE
-   ═══════════════════════════════════════════════ */
+/* ── TABLE ── */
 .table-wrap {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px; overflow: hidden;
-  overflow-x: auto;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  overflow: hidden; overflow-x: auto; box-shadow: 0 8px 40px rgba(0,0,0,0.5);
 }
-
 table { width: 100%; border-collapse: collapse; min-width: 800px; }
-
-thead {
-  background: var(--bg-3);
-  border-bottom: 1px solid var(--border-strong);
-}
-
+thead { background: var(--bg-3); border-bottom: 1px solid var(--border-strong); }
 th {
-  padding: 12px 16px; text-align: left;
-  font-family: var(--font-label); font-size: 10px;
-  font-weight: 700; text-transform: uppercase;
-  letter-spacing: 2px; color: var(--text-muted);
-  white-space: nowrap;
+  padding: 12px 16px; text-align: left; font-family: var(--font-label); font-size: 10px;
+  font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); white-space: nowrap;
 }
-
-/* Consignado column group — subtle purple tint */
 th.cg { border-left: 1px solid rgba(155,127,212,0.2); color: #9B7FD4; }
 td.cg { border-left: 1px solid rgba(155,127,212,0.08); }
-
-td {
-  padding: 13px 16px; font-size: 14px;
-  border-bottom: 1px solid rgba(201,168,76,0.06);
-  vertical-align: middle;
-}
+td { padding: 13px 16px; font-size: 14px; border-bottom: 1px solid rgba(201,168,76,0.06); vertical-align: middle; }
 tr:last-child td { border-bottom: none; }
-
 tr.row { cursor: pointer; transition: background .12s; }
 tr.row:hover { background: rgba(201,168,76,0.04); }
-
-/* Subtle left accent on hover */
 tr.row:hover td:first-child { box-shadow: inset 3px 0 0 var(--gold); }
-
 .client-name { font-weight: 600; color: var(--text); }
 .client-sub  { font-size: 11px; color: var(--text-muted); margin-top: 3px; font-style: italic; }
-
-/* Date */
-.date-cell {
-  font-family: var(--font-label);
-  font-size: 13px; letter-spacing: 1px;
-  color: var(--text-muted);
-}
-
-/* Liters pill */
+.date-cell { font-family: var(--font-label); font-size: 13px; letter-spacing: 1px; color: var(--text-muted); }
 .liters {
   display: inline-flex; align-items: center; gap: 5px;
-  background: rgba(201,168,76,0.1);
-  border: 1px solid rgba(201,168,76,0.28);
-  border-radius: 5px; padding: 3px 10px;
-  font-family: var(--font-label); font-weight: 700;
-  font-size: 13px; letter-spacing: 0.5px;
-  color: var(--gold-light); white-space: nowrap;
+  background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.28);
+  border-radius: 5px; padding: 3px 10px; font-family: var(--font-label);
+  font-weight: 700; font-size: 13px; letter-spacing: 0.5px; color: var(--gold-light); white-space: nowrap;
 }
-
-/* Consignado pill */
 .cpill {
-  display: inline-flex; align-items: center; gap: 5px;
-  border-radius: 5px; padding: 3px 10px;
-  font-family: var(--font-label); font-weight: 700;
-  font-size: 12px; letter-spacing: 0.5px; white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 5px; border-radius: 5px; padding: 3px 10px;
+  font-family: var(--font-label); font-weight: 700; font-size: 12px; letter-spacing: 0.5px; white-space: nowrap;
 }
 .cp-pendente  { background: rgba(155,127,212,.1); border: 1px solid rgba(155,127,212,.3); color: var(--purple); }
 .cp-usado     { background: rgba(107,191,122,.1); border: 1px solid rgba(107,191,122,.3); color: var(--green); }
 .cp-devolvido { background: rgba(106,170,212,.1); border: 1px solid rgba(106,170,212,.3); color: var(--blue); }
 .cp-nao_req   { background: rgba(100,80,40,.15);  border: 1px solid rgba(100,80,40,.3);   color: var(--text-muted); }
-
-/* Status badge */
 .badge {
-  display: inline-flex; align-items: center; gap: 5px;
-  border-radius: 20px; padding: 3px 12px;
-  font-family: var(--font-label); font-size: 11px;
-  font-weight: 700; letter-spacing: 0.5px; white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 5px; border-radius: 20px; padding: 3px 12px;
+  font-family: var(--font-label); font-size: 11px; font-weight: 700; letter-spacing: 0.5px; white-space: nowrap;
 }
 .b-done    { background: rgba(107,191,122,.1); border: 1px solid rgba(107,191,122,.3); color: var(--green); }
 .b-pending { background: rgba(106,170,212,.1); border: 1px solid rgba(106,170,212,.3); color: var(--blue); }
 .b-confirm { background: rgba(201,168,76,.1);  border: 1px solid rgba(201,168,76,.3);  color: var(--gold); }
 .b-cancel  { background: rgba(212,97,74,.08);  border: 1px solid rgba(212,97,74,.25);  color: var(--red); }
-
-.time-tag {
-  font-size: 12px; color: var(--text-muted);
-  font-family: var(--font-label); letter-spacing: 0.5px;
-}
+.time-tag  { font-size: 12px; color: var(--text-muted); font-family: var(--font-label); letter-spacing: 0.5px; }
 .muted { color: var(--text-muted); }
 
-/* ═══════════════════════════════════════════════
-   LOADING / EMPTY
-   ═══════════════════════════════════════════════ */
-.center-msg {
-  text-align: center; padding: 56px 24px; color: var(--text-muted);
-}
+/* ── LOADING / EMPTY ── */
+.center-msg { text-align: center; padding: 56px 24px; color: var(--text-muted); }
 .center-msg .icon { font-size: 40px; margin-bottom: 14px; opacity: .6; }
 .center-msg p { font-family: var(--font-label); font-size: 13px; letter-spacing: 2px; text-transform: uppercase; }
-
 .spinner {
   display: inline-block; width: 32px; height: 32px;
-  border: 2px solid var(--border);
-  border-top-color: var(--gold);
-  border-radius: 50%;
-  animation: spin .8s linear infinite; margin-bottom: 14px;
+  border: 2px solid var(--border); border-top-color: var(--gold);
+  border-radius: 50%; animation: spin .8s linear infinite; margin-bottom: 14px;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ═══════════════════════════════════════════════
-   MODAL
-   ═══════════════════════════════════════════════ */
+/* ── MODAL ── */
 .overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(5,4,2,.92);
-  z-index: 200; align-items: center; justify-content: center;
-  backdrop-filter: blur(6px);
+  display: none; position: fixed; inset: 0; background: rgba(5,4,2,.92);
+  z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(6px);
 }
 .overlay.open { display: flex; }
-
 .modal {
-  background: var(--bg-2);
-  border: 1px solid var(--border-strong);
-  border-radius: 14px; padding: 30px;
-  width: 100%; max-width: 510px;
-  box-shadow: 0 30px 80px rgba(0,0,0,.8), 0 0 0 1px rgba(201,168,76,0.05);
-  animation: up .22s ease;
-  max-height: 92vh; overflow-y: auto;
+  background: var(--bg-2); border: 1px solid var(--border-strong); border-radius: 14px; padding: 30px;
+  width: 100%; max-width: 510px; box-shadow: 0 30px 80px rgba(0,0,0,.8);
+  animation: up .22s ease; max-height: 92vh; overflow-y: auto;
 }
 @keyframes up { from { transform: translateY(20px); opacity: 0; } to { transform: none; opacity: 1; } }
-
-/* Gold top bar on modal */
 .modal::before {
-  content: ''; display: block;
-  height: 2px; margin: -30px -30px 28px;
+  content: ''; display: block; height: 2px; margin: -30px -30px 28px;
   background: linear-gradient(90deg, transparent, var(--gold), transparent);
   border-radius: 14px 14px 0 0;
 }
-
-.modal-head {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 24px;
-}
+.modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
 .modal-head h2 {
-  font-family: var(--font-display);
-  font-size: 22px; font-weight: 900;
+  font-family: var(--font-display); font-size: 22px; font-weight: 900;
   background: linear-gradient(120deg, var(--gold-light), var(--gold));
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
-.close-btn {
-  background: none; border: none; color: var(--text-muted);
-  cursor: pointer; font-size: 18px; line-height: 1;
-  transition: color .2s; padding: 4px;
-}
+.close-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 18px; line-height: 1; transition: color .2s; padding: 4px; }
 .close-btn:hover { color: var(--text); }
-
-/* Form sections */
-.form-section {
-  border: 1px solid var(--border);
-  border-radius: 8px; padding: 16px 16px 6px;
-  margin-bottom: 16px; background: rgba(0,0,0,.2);
-}
-.form-section.consig {
-  border-color: rgba(155,127,212,.2);
-  background: rgba(155,127,212,.03);
-}
-
-.section-label {
-  font-family: var(--font-label); font-size: 10px;
-  font-weight: 700; text-transform: uppercase;
-  letter-spacing: 3px; margin-bottom: 14px;
-}
+.form-section { border: 1px solid var(--border); border-radius: 8px; padding: 16px 16px 6px; margin-bottom: 16px; background: rgba(0,0,0,.2); }
+.form-section.consig { border-color: rgba(155,127,212,.2); background: rgba(155,127,212,.03); }
+.section-label { font-family: var(--font-label); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 14px; }
 .section-label.main   { color: var(--gold-muted); }
 .section-label.consig { color: rgba(155,127,212,.7); }
-
+.section-label.stock  { color: rgba(107,191,122,.7); }
 .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .field { margin-bottom: 12px; }
-.field label {
-  display: block; font-family: var(--font-label);
-  font-size: 10px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 1.5px;
-  color: var(--text-muted); margin-bottom: 7px;
-}
-
+.field label { display: block; font-family: var(--font-label); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 7px; }
 .inp, .sel {
-  width: 100%;
-  background: rgba(0,0,0,.4);
-  border: 1px solid var(--border);
-  border-radius: 6px; padding: 10px 12px;
-  color: var(--text); font-size: 14px;
-  font-family: var(--font-body);
-  transition: border-color .2s;
+  width: 100%; background: rgba(0,0,0,.4); border: 1px solid var(--border); border-radius: 6px;
+  padding: 10px 12px; color: var(--text); font-size: 14px; font-family: var(--font-body); transition: border-color .2s;
 }
 .inp:focus, .sel:focus { outline: none; border-color: var(--gold-muted); }
 .sel option { background: var(--bg-3); }
-
-/* Consignado toggle */
 .toggle-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
 .toggle-lbl { font-family: var(--font-body); font-size: 13px; color: var(--text-muted); }
 .toggle {
-  appearance: none; width: 38px; height: 20px;
-  background: var(--bg-4); border: 1px solid var(--border);
-  border-radius: 20px; cursor: pointer; position: relative;
-  transition: all .2s; flex-shrink: 0;
+  appearance: none; width: 38px; height: 20px; background: var(--bg-4);
+  border: 1px solid var(--border); border-radius: 20px; cursor: pointer;
+  position: relative; transition: all .2s; flex-shrink: 0;
 }
 .toggle::after {
-  content: ''; position: absolute; top: 3px; left: 3px;
-  width: 12px; height: 12px; border-radius: 50%;
-  background: var(--text-muted); transition: left .2s, background .2s;
+  content: ''; position: absolute; top: 3px; left: 3px; width: 12px; height: 12px;
+  border-radius: 50%; background: var(--text-muted); transition: left .2s, background .2s;
 }
 .toggle:checked { background: rgba(155,127,212,.25); border-color: rgba(155,127,212,.5); }
 .toggle:checked::after { left: 21px; background: var(--purple); }
-
 .consig-fields { display: none; }
 .consig-fields.show { display: block; }
-
 .modal-foot {
-  display: flex; gap: 10px; justify-content: flex-end;
-  margin-top: 22px; align-items: center;
-  padding-top: 18px;
-  border-top: 1px solid var(--border);
+  display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px;
+  align-items: center; padding-top: 18px; border-top: 1px solid var(--border);
 }
 
-/* ═══════════════════════════════════════════════
-   CONFIG BANNER
-   ═══════════════════════════════════════════════ */
+/* ── ESTOQUE MODAL ── */
+.est-modal-info {
+  background: rgba(0,0,0,.2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 14px 16px; margin-bottom: 16px;
+  font-size: 13px; line-height: 1.8; color: var(--text-muted);
+}
+.est-modal-info strong { color: var(--text); }
+.est-modal-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.est-modal-row:last-child { border-bottom: none; }
+.est-modal-total { color: var(--gold-light); font-weight: 700; font-size: 15px; }
+
+/* ── CONFIG BANNER ── */
 .config-banner {
   background: rgba(212,97,74,.08); border: 1px solid rgba(212,97,74,.35);
   border-radius: 8px; padding: 16px 20px; margin-bottom: 24px;
@@ -522,54 +359,43 @@ tr.row:hover td:first-child { box-shadow: inset 3px 0 0 var(--gold); }
 }
 .config-banner.show { display: block; }
 .config-banner strong { color: var(--red); }
-.config-banner code {
-  background: rgba(0,0,0,.3); border-radius: 4px;
-  padding: 1px 6px; font-size: 12px; color: var(--gold-light);
-}
+.config-banner code { background: rgba(0,0,0,.3); border-radius: 4px; padding: 1px 6px; font-size: 12px; color: var(--gold-light); }
 
-/* ═══════════════════════════════════════════════
-   TOAST
-   ═══════════════════════════════════════════════ */
+/* ── TOAST ── */
 .toast {
-  position: fixed; bottom: 24px; right: 24px;
-  background: var(--bg-3);
-  border: 1px solid var(--border-strong);
-  border-radius: 8px; padding: 12px 20px; font-size: 14px;
-  font-family: var(--font-body);
-  z-index: 300; transform: translateY(70px); opacity: 0;
-  transition: all .3s; max-width: 300px;
+  position: fixed; bottom: 24px; right: 24px; background: var(--bg-3);
+  border: 1px solid var(--border-strong); border-radius: 8px; padding: 12px 20px;
+  font-size: 14px; font-family: var(--font-body); z-index: 300;
+  transform: translateY(70px); opacity: 0; transition: all .3s; max-width: 300px;
   box-shadow: 0 8px 30px rgba(0,0,0,.6);
 }
 .toast.show { transform: none; opacity: 1; }
 
-/* ═══════════════════════════════════════════════
-   DIVIDER
-   ═══════════════════════════════════════════════ */
-.divider {
-  height: 1px; margin: 28px 0;
-  background: linear-gradient(90deg, transparent, var(--border-strong), transparent);
-}
+/* ── DIVIDER ── */
+.divider { height: 1px; margin: 28px 0; background: linear-gradient(90deg, transparent, var(--border-strong), transparent); }
 
-/* ═══════════════════════════════════════════════
-   RESPONSIVE
-   ═══════════════════════════════════════════════ */
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .estoque-wrap { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .est-block + .est-block { border-left: none; border-top: 1px solid var(--border); padding-top: 12px; }
+  .est-action { border-top: 1px solid var(--border); padding: 12px 0 0; grid-column: span 2; }
+}
 @media (max-width: 720px) {
   .stats { grid-template-columns: repeat(3, 1fr); }
-  .stats .stat:nth-child(4), .stats .stat:nth-child(5) { grid-column: span 1; }
   .header-month { display: none; }
   .logo-name { font-size: 22px; }
   main { padding: 20px 12px 60px; }
+  .estoque-wrap { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 480px) {
   .stats { grid-template-columns: repeat(2, 1fr); }
+  .estoque-wrap { grid-template-columns: 1fr; }
+  .est-action { grid-column: span 1; }
 }
 </style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════
-     HEADER
-══════════════════════════════════ -->
 <header>
   <div class="logo">
     <div class="logo-wordmark">
@@ -577,7 +403,6 @@ tr.row:hover td:first-child { box-shadow: inset 3px 0 0 var(--gold); }
       <span class="logo-sub">Cervejaria Artesanal</span>
     </div>
   </div>
-
   <div class="header-right">
     <div class="conn-pill" id="connPill">
       <span class="conn-dot"></span>
@@ -590,18 +415,48 @@ tr.row:hover td:first-child { box-shadow: inset 3px 0 0 var(--gold); }
   </div>
 </header>
 
-<!-- ══════════════════════════════════
-     MAIN
-══════════════════════════════════ -->
 <main>
 
   <div class="config-banner" id="configBanner">
     ⚠️ <strong>Configuração necessária:</strong>
     Abra o arquivo <code>index.html</code> e preencha <code>SUPABASE_URL</code> e <code>SUPABASE_ANON_KEY</code>.
-    Veja o guia de instalação.
   </div>
 
-  <!-- STATS -->
+  <!-- ── ESTOQUE ── -->
+  <div class="eyebrow">Estoque</div>
+  <div class="estoque-wrap" id="estoqueWrap">
+
+    <div class="est-block">
+      <div class="est-label">🏭 Estoque Total</div>
+      <div class="est-val" id="eTotal">—</div>
+      <div class="est-sub">litros disponíveis</div>
+    </div>
+
+    <div class="est-block">
+      <div class="est-label">⏳ Comprometido (mês)</div>
+      <div class="est-val warn" id="eComprometido">—</div>
+      <div class="est-sub" id="eComprometidoSub">pendentes + consig. pendentes</div>
+    </div>
+
+    <div class="est-block">
+      <div class="est-label">✅ Estoque Livre</div>
+      <div class="est-val" id="eLivre">—</div>
+      <div class="est-sub">
+        <div class="est-bar-wrap">
+          <div class="est-bar-track"><div class="est-bar-fill" id="eBar" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="est-block est-action">
+      <button class="btn" onclick="openEstoqueModal()">+ Adicionar Produção</button>
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── STATS ── -->
   <div class="eyebrow">Resumo do mês</div>
   <div class="stats">
     <div class="stat"><div class="stat-val" id="sTotal">—</div><div class="stat-lbl">Pedidos</div></div>
@@ -613,13 +468,12 @@ tr.row:hover td:first-child { box-shadow: inset 3px 0 0 var(--gold); }
 
   <div class="divider"></div>
 
-  <!-- TOOLBAR -->
+  <!-- ── PEDIDOS ── -->
   <div class="toolbar">
     <div class="section-title">Pedidos do Mês</div>
     <button class="btn" onclick="openModal()">+ Novo Pedido</button>
   </div>
 
-  <!-- FILTERS -->
   <div class="filters">
     <input class="search" id="searchInput" type="text" placeholder="Buscar cliente..." oninput="render()">
     <button class="chip active" onclick="setFilter('todos',this)">Todos</button>
@@ -630,7 +484,6 @@ tr.row:hover td:first-child { box-shadow: inset 3px 0 0 var(--gold); }
     <button class="chip" onclick="setFilter('consig_pendente',this)">🟣 Consig. Pendente</button>
   </div>
 
-  <!-- TABLE -->
   <div class="table-wrap">
     <table>
       <thead>
@@ -655,9 +508,7 @@ tr.row:hover td:first-child { box-shadow: inset 3px 0 0 var(--gold); }
 
 </main>
 
-<!-- ══════════════════════════════════
-     MODAL
-══════════════════════════════════ -->
+<!-- ══ MODAL PEDIDO ══ -->
 <div class="overlay" id="overlay">
   <div class="modal">
     <div class="modal-head">
@@ -665,7 +516,6 @@ tr.row:hover td:first-child { box-shadow: inset 3px 0 0 var(--gold); }
       <button class="close-btn" onclick="closeModal()">✕</button>
     </div>
 
-    <!-- Pedido principal -->
     <div class="form-section">
       <div class="section-label main">📦 Pedido Principal</div>
       <div class="row2">
@@ -703,7 +553,6 @@ tr.row:hover td:first-child { box-shadow: inset 3px 0 0 var(--gold); }
       </div>
     </div>
 
-    <!-- Consignado -->
     <div class="form-section consig">
       <div class="section-label consig">🟣 Consignado</div>
       <div class="toggle-row">
@@ -738,11 +587,58 @@ tr.row:hover td:first-child { box-shadow: inset 3px 0 0 var(--gold); }
   </div>
 </div>
 
+<!-- ══ MODAL ESTOQUE ══ -->
+<div class="overlay" id="overlayEstoque">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-head">
+      <h2>Adicionar Produção</h2>
+      <button class="close-btn" onclick="closeEstoqueModal()">✕</button>
+    </div>
+
+    <!-- Resumo atual -->
+    <div class="est-modal-info" id="estModalInfo">
+      <div class="est-modal-row"><span>Estoque atual</span><span id="emAtual">— L</span></div>
+      <div class="est-modal-row"><span>Comprometido este mês</span><span id="emComprometido">— L</span></div>
+      <div class="est-modal-row"><span style="font-weight:600;color:var(--text)">Livre</span><span class="est-modal-total" id="emLivre">— L</span></div>
+    </div>
+
+    <div class="form-section" style="border-color:rgba(107,191,122,.2);background:rgba(107,191,122,.03)">
+      <div class="section-label stock">🏭 Nova Produção</div>
+      <div class="field">
+        <label>Litros Produzidos</label>
+        <input type="number" class="inp" id="fEstoqueLitros" placeholder="Ex: 200" min="1">
+      </div>
+      <div class="field">
+        <label>Observação (opcional)</label>
+        <input type="text" class="inp" id="fEstoqueNota" placeholder="Ex: Lote Janeiro">
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn btn-ghost btn-sm" onclick="openHistoricoModal()">Ver Histórico</button>
+      <div style="flex:1"></div>
+      <button class="btn btn-ghost" onclick="closeEstoqueModal()">Cancelar</button>
+      <button class="btn" id="savEstBtn" onclick="saveEstoque()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL HISTÓRICO ══ -->
+<div class="overlay" id="overlayHistorico">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-head">
+      <h2>Histórico de Produção</h2>
+      <button class="close-btn" onclick="closeHistoricoModal()">✕</button>
+    </div>
+    <div id="historicoList" style="max-height:400px;overflow-y:auto"></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeHistoricoModal()">Fechar</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
-<!-- ══════════════════════════════════
-     SCRIPT
-══════════════════════════════════ -->
 <script>
 // ┌─────────────────────────────────────────────────────────┐
 // │  🔧 CONFIGURAÇÃO — preencha com seus dados do Supabase  │
@@ -751,9 +647,15 @@ const SUPABASE_URL      = 'https://fsgdsrdgocaokmuifzpm.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZzZ2RzcmRnb2Nhb2ttdWlmenBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MjI4NTEsImV4cCI6MjA4OTQ5ODg1MX0.vlx8wF4bs2WR8kOMhS3qtqMw-dDY-yK_xR8oRmVcCN4';
 // ──────────────────────────────────────────────────────────
 
-const TABLE = 'pedidos';
-let db, orders = [], currentFilter = 'todos', editingId = null;
+const TABLE         = 'pedidos';
+const TABLE_ESTOQUE = 'estoque_producao';
 
+let db, orders = [], estoqueTotal = 0, producoes = [];
+let currentFilter = 'todos', editingId = null;
+
+// ═══════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════
 async function init() {
   if (SUPABASE_URL === 'COLE_SUA_URL_AQUI') {
     document.getElementById('configBanner').classList.add('show');
@@ -762,11 +664,15 @@ async function init() {
   }
   try {
     db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    await fetchOrders();
+    await Promise.all([fetchOrders(), fetchEstoque()]);
     setConn('online');
-    db.channel('pedidos')
-      .on('postgres_changes', { event: '*', schema: 'public', table: TABLE }, () => fetchOrders())
+
+    // Real-time
+    db.channel('changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: TABLE },         () => fetchOrders())
+      .on('postgres_changes', { event: '*', schema: 'public', table: TABLE_ESTOQUE }, () => fetchEstoque())
       .subscribe();
+
   } catch(e) {
     setConn('offline');
     showMsg('⚠️', 'Erro ao conectar');
@@ -774,14 +680,107 @@ async function init() {
   }
 }
 
+// ═══════════════════════════════════════
+//  FETCH ORDERS
+// ═══════════════════════════════════════
 async function fetchOrders() {
-  const { data, error } = await db.from(TABLE).select('*').order('data', { ascending: false }).order('id', { ascending: false });
+  const { data, error } = await db
+    .from(TABLE).select('*')
+    .order('data', { ascending: false })
+    .order('id',   { ascending: false });
   if (error) { console.error(error); return; }
   orders = data || [];
-  render(); updateStats(); updateMonth();
+  render(); updateStats(); updateEstoqueUI(); updateMonth();
 }
 
-// ── RENDER ────────────────────────────────────────────────
+// ═══════════════════════════════════════
+//  FETCH ESTOQUE
+// ═══════════════════════════════════════
+async function fetchEstoque() {
+  const { data, error } = await db
+    .from(TABLE_ESTOQUE).select('*')
+    .order('criado_em', { ascending: false });
+  if (error) { console.error(error); return; }
+  producoes = data || [];
+
+  // Estoque total = soma de todas as produções MENOS litros já realizados (consumo real)
+  // Realizados já foram subtraídos na inserção via trigger — aqui somamos só as produções
+  estoqueTotal = producoes.reduce((s, p) => s + (p.litros || 0), 0);
+
+  updateEstoqueUI();
+}
+
+// ═══════════════════════════════════════
+//  CALCULAR COMPROMETIDO DO MÊS ATUAL
+// ═══════════════════════════════════════
+function calcComprometidoMes() {
+  const now   = new Date();
+  const mes   = now.getMonth();
+  const ano   = now.getFullYear();
+
+  return orders.reduce((sum, o) => {
+    if (!o.data) return sum;
+    const d = new Date(o.data + 'T12:00:00');
+    if (d.getMonth() !== mes || d.getFullYear() !== ano) return sum;
+
+    // Pedidos pendentes e a confirmar comprometem estoque
+    let comprometido = 0;
+    if (o.status === 'pendente' || o.status === 'confirmar') {
+      comprometido += (o.litros || 0);
+    }
+    // Consignado pendente também compromete
+    if (o.litros_consignado && o.status_consignado === 'pendente') {
+      comprometido += o.litros_consignado;
+    }
+    return sum + comprometido;
+  }, 0);
+}
+
+// ═══════════════════════════════════════
+//  CALCULAR TOTAL CONSUMIDO (Realizados + Consig Usado)
+// ═══════════════════════════════════════
+function calcConsumido() {
+  return orders.reduce((sum, o) => {
+    let c = 0;
+    if (o.status === 'realizado') c += (o.litros || 0);
+    if (o.litros_consignado && o.status_consignado === 'usado') c += o.litros_consignado;
+    return sum + c;
+  }, 0);
+}
+
+// ═══════════════════════════════════════
+//  UPDATE ESTOQUE UI
+// ═══════════════════════════════════════
+function updateEstoqueUI() {
+  const consumido     = calcConsumido();
+  const estoqueReal   = estoqueTotal - consumido;   // total produzido − já entregue
+  const comprometido  = calcComprometidoMes();
+  const livre         = estoqueReal - comprometido;
+
+  // Cores dinâmicas
+  const pct    = estoqueReal > 0 ? Math.max(0, Math.min(100, (livre / estoqueReal) * 100)) : 0;
+  const danger = livre < 0 || pct < 15;
+  const warn   = !danger && pct < 35;
+
+  document.getElementById('eTotal').textContent       = estoqueReal + 'L';
+  document.getElementById('eComprometido').textContent = comprometido + 'L';
+
+  const livreEl  = document.getElementById('eLivre');
+  const barEl    = document.getElementById('eBar');
+  livreEl.textContent = livre + 'L';
+  livreEl.className   = 'est-val ' + (danger ? 'danger' : warn ? 'warn' : 'safe');
+  barEl.style.width   = pct + '%';
+  barEl.className     = 'est-bar-fill ' + (danger ? 'danger' : warn ? 'warn' : '');
+
+  // Atualiza o modal de estoque se estiver aberto
+  document.getElementById('emAtual').textContent       = estoqueReal + ' L';
+  document.getElementById('emComprometido').textContent = comprometido + ' L';
+  document.getElementById('emLivre').textContent        = livre + ' L';
+}
+
+// ═══════════════════════════════════════
+//  RENDER TABLE
+// ═══════════════════════════════════════
 const CONSIG_MAP = {
   pendente:        ['cp-pendente',  '🟣 Pendente'],
   usado:           ['cp-usado',     '✅ Usado'],
@@ -850,12 +849,14 @@ function updateStats() {
 function updateMonth() {
   const dates = orders.map(o => o.data).filter(Boolean).sort();
   if (!dates.length) return;
-  const d = new Date(dates[0]+'T12:00:00');
+  const d = new Date(dates[dates.length-1]+'T12:00:00');
   document.getElementById('hMonth').textContent =
     d.toLocaleDateString('pt-BR', { month:'long', year:'numeric' }).replace(/^\w/, c => c.toUpperCase());
 }
 
-// ── FILTERS ───────────────────────────────────────────────
+// ═══════════════════════════════════════
+//  FILTERS
+// ═══════════════════════════════════════
 function setFilter(f, el) {
   currentFilter = f;
   document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
@@ -863,7 +864,9 @@ function setFilter(f, el) {
   render();
 }
 
-// ── MODAL ─────────────────────────────────────────────────
+// ═══════════════════════════════════════
+//  MODAL PEDIDO
+// ═══════════════════════════════════════
 function toggleConsig() {
   document.getElementById('consigFields').classList
     .toggle('show', document.getElementById('fConsigToggle').checked);
@@ -926,7 +929,7 @@ async function saveOrder() {
     status_consignado: hc ? document.getElementById('fConsigStatus').value : null,
   };
 
-  setBusy(true);
+  setBusy('saveBtn', true);
   let error;
   if (editingId) {
     ({ error } = await db.from(TABLE).update(payload).eq('id', editingId));
@@ -935,7 +938,7 @@ async function saveOrder() {
     ({ error } = await db.from(TABLE).insert(payload));
     if (!error) toast('🍺 Pedido adicionado!');
   }
-  setBusy(false);
+  setBusy('saveBtn', false);
   if (error) { toast('❌ Erro: ' + error.message); return; }
   closeModal(); await fetchOrders();
 }
@@ -961,17 +964,93 @@ function quickConsig(id) {
   }, 120);
 }
 
-// ── HELPERS ───────────────────────────────────────────────
+// ═══════════════════════════════════════
+//  MODAL ESTOQUE
+// ═══════════════════════════════════════
+function openEstoqueModal() {
+  updateEstoqueUI(); // refresh números
+  document.getElementById('fEstoqueLitros').value = '';
+  document.getElementById('fEstoqueNota').value   = '';
+  document.getElementById('overlayEstoque').classList.add('open');
+  setTimeout(() => document.getElementById('fEstoqueLitros').focus(), 80);
+}
+
+function closeEstoqueModal() {
+  document.getElementById('overlayEstoque').classList.remove('open');
+}
+
+async function saveEstoque() {
+  const litros = parseInt(document.getElementById('fEstoqueLitros').value);
+  if (!litros || litros < 1) { toast('⚠️ Informe a quantidade produzida'); return; }
+
+  const nota = document.getElementById('fEstoqueNota').value.trim() || null;
+
+  setBusy('savEstBtn', true);
+  const { error } = await db.from(TABLE_ESTOQUE).insert({ litros, nota });
+  setBusy('savEstBtn', false);
+
+  if (error) { toast('❌ Erro: ' + error.message); return; }
+  toast('🏭 Produção registrada! +' + litros + 'L');
+  closeEstoqueModal();
+  await fetchEstoque();
+}
+
+// ═══════════════════════════════════════
+//  MODAL HISTÓRICO
+// ═══════════════════════════════════════
+function openHistoricoModal() {
+  closeEstoqueModal();
+  const list = document.getElementById('historicoList');
+
+  if (!producoes.length) {
+    list.innerHTML = '<div class="center-msg"><div class="icon">📋</div><p>Nenhum registro ainda</p></div>';
+  } else {
+    list.innerHTML = producoes.map(p => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border)">
+        <div>
+          <div style="font-weight:600;color:var(--text)">+${p.litros}L</div>
+          ${p.nota ? `<div style="font-size:12px;color:var(--text-muted);font-style:italic;margin-top:2px">${esc(p.nota)}</div>` : ''}
+        </div>
+        <div style="font-family:var(--font-label);font-size:12px;color:var(--text-muted);letter-spacing:0.5px">
+          ${fmtDateTime(p.criado_em)}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('overlayHistorico').classList.add('open');
+}
+
+function closeHistoricoModal() {
+  document.getElementById('overlayHistorico').classList.remove('open');
+}
+
+// ═══════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════
 function statusBadge(s) {
-  const m = { realizado:['b-done','✅ Realizado'], pendente:['b-pending','⏳ Pendente'], confirmar:['b-confirm','❓ A Confirmar'], desistiu:['b-cancel','❌ Desistiu'] };
+  const m = {
+    realizado: ['b-done',    '✅ Realizado'],
+    pendente:  ['b-pending', '⏳ Pendente'],
+    confirmar: ['b-confirm', '❓ A Confirmar'],
+    desistiu:  ['b-cancel',  '❌ Desistiu'],
+  };
   const [cls, lbl] = m[s] || ['b-pending', s];
   return `<span class="badge ${cls}">${lbl}</span>`;
 }
+
 function fmtDate(d) {
   if (!d) return '—';
   const [,m,day] = d.split('-');
   return `${day}/${m}`;
 }
+
+function fmtDateTime(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+}
+
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function today() { return new Date().toISOString().split('T')[0]; }
 
@@ -980,16 +1059,20 @@ function setConn(state) {
   el.className = 'conn-pill ' + state;
   document.getElementById('connLabel').textContent = state === 'online' ? 'Online' : 'Offline';
 }
+
 function showMsg(icon, txt) {
   document.getElementById('tbody').innerHTML = '';
   const m = document.getElementById('centerMsg');
   m.style.display = 'block';
   m.innerHTML = `<div class="icon">${icon}</div><p>${txt}</p>`;
 }
-function setBusy(b) {
-  document.getElementById('saveBtn').disabled    = b;
-  document.getElementById('saveBtn').textContent = b ? 'Salvando...' : 'Salvar';
+
+function setBusy(btnId, b) {
+  const btn = document.getElementById(btnId);
+  btn.disabled    = b;
+  btn.textContent = b ? 'Salvando...' : 'Salvar';
 }
+
 let _tt;
 function toast(msg) {
   const el = document.getElementById('toast');
@@ -997,10 +1080,11 @@ function toast(msg) {
   clearTimeout(_tt); _tt = setTimeout(() => el.classList.remove('show'), 2800);
 }
 
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-document.getElementById('overlay').addEventListener('click', e => {
-  if (e.target === document.getElementById('overlay')) closeModal();
-});
+// ── KEYBOARD ──
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeEstoqueModal(); closeHistoricoModal(); } });
+document.getElementById('overlay').addEventListener('click',          e => { if (e.target === document.getElementById('overlay'))          closeModal(); });
+document.getElementById('overlayEstoque').addEventListener('click',   e => { if (e.target === document.getElementById('overlayEstoque'))   closeEstoqueModal(); });
+document.getElementById('overlayHistorico').addEventListener('click', e => { if (e.target === document.getElementById('overlayHistorico')) closeHistoricoModal(); });
 
 init();
 </script>
