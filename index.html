@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BerBeck — Pedidos de Chopp</title>
+
+<!-- Playfair Display = serifada pesada para headers / Barlow Condensed = subtítulo estilo cervejaria -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+/* ═══════════════════════════════════════════════
+   TOKENS — cores extraídas direto da logo BerBeck
+   ═══════════════════════════════════════════════ */
+:root {
+  /* Brand */
+  --gold:          #C9A84C;   /* dourado principal — corpo da logo */
+  --gold-light:    #DFC278;   /* highlight */
+  --gold-dim:      #A8893C;   /* hover/active */
+  --gold-muted:    #6B5520;   /* texto fraco / borders */
+  --gold-faint:    rgba(201,168,76,0.12);
+
+  /* Backgrounds — preto quente como o fundo da logo */
+  --bg:            #0A0A08;
+  --bg-1:          #100F0C;
+  --bg-2:          #171510;
+  --bg-3:          #1F1C14;
+  --bg-4:          #28231A;
+
+  /* Text */
+  --text:          #EDE5CC;   /* creme — cor da tipografia "CERVEJARIA ARTESANAL" */
+  --text-muted:    #7A6840;
+
+  /* Status */
+  --green:         #6BBF7A;
+  --blue:          #6AAAD4;
+  --red:           #D4614A;
+  --orange:        #D4904A;
+  --purple:        #9B7FD4;
+
+  /* Misc */
+  --border:        rgba(201,168,76,0.15);
+  --border-strong: rgba(201,168,76,0.35);
+  --card:          rgba(23,21,16,0.95);
+
+  /* Typo */
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-label:   'Barlow Condensed', sans-serif;
+  --font-body:    'Barlow', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  /* Subtle texture — radial grain pattern */
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201,168,76,0.06) 0%, transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+}
+
+/* ═══════════════════════════════════════════════
+   HEADER
+   ═══════════════════════════════════════════════ */
+header {
+  position: sticky; top: 0; z-index: 50;
+  background: var(--bg-1);
+  border-bottom: 1px solid var(--border-strong);
+  /* Subtle top gold line */
+  box-shadow: 0 -3px 0 0 var(--gold) inset, 0 4px 40px rgba(0,0,0,0.8);
+  padding: 0 28px;
+  height: 68px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+/* Logo SVG-text styled to match brand */
+.logo {
+  display: flex; align-items: center; gap: 14px;
+}
+
+.logo-wordmark {
+  display: flex; flex-direction: column; line-height: 1;
+}
+
+.logo-name {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 28px;
+  letter-spacing: 3px;
+  /* Gradient matches the aged-gold of the actual logo */
+  background: linear-gradient(160deg, var(--gold-light) 0%, var(--gold) 45%, var(--gold-dim) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-transform: uppercase;
+}
+
+.logo-sub {
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: 9px;
+  letter-spacing: 4px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+
+.header-right {
+  display: flex; align-items: center; gap: 16px;
+}
+
+.conn-pill {
+  display: flex; align-items: center; gap: 7px;
+  background: var(--bg-3); border: 1px solid var(--border);
+  border-radius: 20px; padding: 5px 12px;
+  font-family: var(--font-label); font-size: 12px; letter-spacing: 1px;
+  color: var(--text-muted); transition: border-color .3s, color .3s;
+}
+.conn-pill.online  { border-color: rgba(107,191,122,0.4); color: var(--green); }
+.conn-pill.offline { border-color: rgba(212,97,74,0.4);  color: var(--red); }
+
+.conn-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: currentColor;
+}
+.conn-pill.online  .conn-dot { box-shadow: 0 0 6px var(--green); }
+.conn-pill.offline .conn-dot { box-shadow: 0 0 6px var(--red); }
+
+.header-month {
+  font-family: var(--font-label);
+  letter-spacing: 1px; text-align: right;
+}
+.header-month strong { display: block; color: var(--gold-light); font-size: 14px; font-weight: 700; }
+.header-month span   { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; }
+
+/* ═══════════════════════════════════════════════
+   MAIN
+   ═══════════════════════════════════════════════ */
+main { max-width: 1200px; margin: 0 auto; padding: 32px 20px 80px; }
+
+/* ═══════════════════════════════════════════════
+   SECTION LABEL — estilo "CERVEJARIA ARTESANAL"
+   ═══════════════════════════════════════════════ */
+.eyebrow {
+  font-family: var(--font-label);
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 4px; text-transform: uppercase;
+  color: var(--text-muted);
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px;
+}
+.eyebrow::before, .eyebrow::after {
+  content: '';
+  flex: 1; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-strong));
+}
+.eyebrow::before { background: linear-gradient(90deg, var(--border-strong), transparent); }
+
+/* ═══════════════════════════════════════════════
+   STATS
+   ═══════════════════════════════════════════════ */
+.stats {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 10px; margin-bottom: 36px;
+}
+
+.stat {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px 14px 14px;
+  text-align: center;
+  position: relative; overflow: hidden;
+  transition: border-color .2s, transform .2s;
+}
+
+.stat::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0; transition: opacity .2s;
+}
+.stat:hover { border-color: var(--border-strong); transform: translateY(-2px); }
+.stat:hover::before { opacity: 1; }
+
+.stat-val {
+  font-family: var(--font-display);
+  font-weight: 900; font-size: 34px; line-height: 1;
+  background: linear-gradient(160deg, var(--gold-light), var(--gold));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.stat-val.warn {
+  background: linear-gradient(160deg, #F0A860, var(--orange));
+  -webkit-background-clip: text; background-clip: text;
+}
+.stat-lbl {
+  font-family: var(--font-label);
+  font-size: 9px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 2px;
+  color: var(--text-muted); margin-top: 6px;
+}
+
+/* ═══════════════════════════════════════════════
+   TOOLBAR
+   ═══════════════════════════════════════════════ */
+.toolbar {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap; gap: 12px; margin-bottom: 16px;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: 20px; font-weight: 700;
+  background: linear-gradient(120deg, var(--gold-light), var(--gold));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+
+/* ═══════════════════════════════════════════════
+   BUTTONS
+   ═══════════════════════════════════════════════ */
+.btn {
+  background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 60%, var(--gold-dim) 100%);
+  color: var(--bg);
+  border: none; border-radius: 6px;
+  padding: 10px 22px;
+  font-family: var(--font-label); font-weight: 700;
+  font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase;
+  cursor: pointer;
+  display: inline-flex; align-items: center; gap: 7px;
+  transition: filter .15s, transform .1s;
+  box-shadow: 0 2px 12px rgba(201,168,76,0.2);
+}
+.btn:hover   { filter: brightness(1.1); }
+.btn:active  { transform: scale(.97); }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  color: var(--gold);
+  box-shadow: none;
+}
+.btn-ghost:hover { background: var(--gold-faint); filter: none; }
+
+.btn-sm { padding: 5px 12px; font-size: 11px; letter-spacing: 1px; border-radius: 5px; }
+.btn-danger { background: linear-gradient(135deg, #E07060, var(--red)); color: #fff; box-shadow: none; }
+.btn-danger:hover { filter: brightness(1.1); }
+
+/* ═══════════════════════════════════════════════
+   FILTER CHIPS
+   ═══════════════════════════════════════════════ */
+.filters {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  align-items: center; margin-bottom: 16px;
+}
+
+.chip {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted); border-radius: 4px;
+  padding: 5px 14px;
+  font-family: var(--font-label); font-size: 12px;
+  font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+  cursor: pointer; transition: all .15s;
+}
+.chip:hover  { border-color: var(--gold-muted); color: var(--text); }
+.chip.active {
+  background: linear-gradient(135deg, var(--gold-light), var(--gold-dim));
+  border-color: transparent; color: var(--bg); font-weight: 700;
+}
+
+.search {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 6px; padding: 7px 13px;
+  color: var(--text); font-family: var(--font-body); font-size: 13px;
+  width: 200px; transition: border-color .2s;
+}
+.search:focus { outline: none; border-color: var(--gold-muted); }
+.search::placeholder { color: var(--text-muted); }
+
+/* ═══════════════════════════════════════════════
+   TABLE
+   ═══════════════════════════════════════════════ */
+.table-wrap {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px; overflow: hidden;
+  overflow-x: auto;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+}
+
+table { width: 100%; border-collapse: collapse; min-width: 800px; }
+
+thead {
+  background: var(--bg-3);
+  border-bottom: 1px solid var(--border-strong);
+}
+
+th {
+  padding: 12px 16px; text-align: left;
+  font-family: var(--font-label); font-size: 10px;
+  font-weight: 700; text-transform: uppercase;
+  letter-spacing: 2px; color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* Consignado column group — subtle purple tint */
+th.cg { border-left: 1px solid rgba(155,127,212,0.2); color: #9B7FD4; }
+td.cg { border-left: 1px solid rgba(155,127,212,0.08); }
+
+td {
+  padding: 13px 16px; font-size: 14px;
+  border-bottom: 1px solid rgba(201,168,76,0.06);
+  vertical-align: middle;
+}
+tr:last-child td { border-bottom: none; }
+
+tr.row { cursor: pointer; transition: background .12s; }
+tr.row:hover { background: rgba(201,168,76,0.04); }
+
+/* Subtle left accent on hover */
+tr.row:hover td:first-child { box-shadow: inset 3px 0 0 var(--gold); }
+
+.client-name { font-weight: 600; color: var(--text); }
+.client-sub  { font-size: 11px; color: var(--text-muted); margin-top: 3px; font-style: italic; }
+
+/* Date */
+.date-cell {
+  font-family: var(--font-label);
+  font-size: 13px; letter-spacing: 1px;
+  color: var(--text-muted);
+}
+
+/* Liters pill */
+.liters {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(201,168,76,0.1);
+  border: 1px solid rgba(201,168,76,0.28);
+  border-radius: 5px; padding: 3px 10px;
+  font-family: var(--font-label); font-weight: 700;
+  font-size: 13px; letter-spacing: 0.5px;
+  color: var(--gold-light); white-space: nowrap;
+}
+
+/* Consignado pill */
+.cpill {
+  display: inline-flex; align-items: center; gap: 5px;
+  border-radius: 5px; padding: 3px 10px;
+  font-family: var(--font-label); font-weight: 700;
+  font-size: 12px; letter-spacing: 0.5px; white-space: nowrap;
+}
+.cp-pendente  { background: rgba(155,127,212,.1); border: 1px solid rgba(155,127,212,.3); color: var(--purple); }
+.cp-usado     { background: rgba(107,191,122,.1); border: 1px solid rgba(107,191,122,.3); color: var(--green); }
+.cp-devolvido { background: rgba(106,170,212,.1); border: 1px solid rgba(106,170,212,.3); color: var(--blue); }
+.cp-nao_req   { background: rgba(100,80,40,.15);  border: 1px solid rgba(100,80,40,.3);   color: var(--text-muted); }
+
+/* Status badge */
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  border-radius: 20px; padding: 3px 12px;
+  font-family: var(--font-label); font-size: 11px;
+  font-weight: 700; letter-spacing: 0.5px; white-space: nowrap;
+}
+.b-done    { background: rgba(107,191,122,.1); border: 1px solid rgba(107,191,122,.3); color: var(--green); }
+.b-pending { background: rgba(106,170,212,.1); border: 1px solid rgba(106,170,212,.3); color: var(--blue); }
+.b-confirm { background: rgba(201,168,76,.1);  border: 1px solid rgba(201,168,76,.3);  color: var(--gold); }
+.b-cancel  { background: rgba(212,97,74,.08);  border: 1px solid rgba(212,97,74,.25);  color: var(--red); }
+
+.time-tag {
+  font-size: 12px; color: var(--text-muted);
+  font-family: var(--font-label); letter-spacing: 0.5px;
+}
+.muted { color: var(--text-muted); }
+
+/* ═══════════════════════════════════════════════
+   LOADING / EMPTY
+   ═══════════════════════════════════════════════ */
+.center-msg {
+  text-align: center; padding: 56px 24px; color: var(--text-muted);
+}
+.center-msg .icon { font-size: 40px; margin-bottom: 14px; opacity: .6; }
+.center-msg p { font-family: var(--font-label); font-size: 13px; letter-spacing: 2px; text-transform: uppercase; }
+
+.spinner {
+  display: inline-block; width: 32px; height: 32px;
+  border: 2px solid var(--border);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin .8s linear infinite; margin-bottom: 14px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ═══════════════════════════════════════════════
+   MODAL
+   ═══════════════════════════════════════════════ */
+.overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(5,4,2,.92);
+  z-index: 200; align-items: center; justify-content: center;
+  backdrop-filter: blur(6px);
+}
+.overlay.open { display: flex; }
+
+.modal {
+  background: var(--bg-2);
+  border: 1px solid var(--border-strong);
+  border-radius: 14px; padding: 30px;
+  width: 100%; max-width: 510px;
+  box-shadow: 0 30px 80px rgba(0,0,0,.8), 0 0 0 1px rgba(201,168,76,0.05);
+  animation: up .22s ease;
+  max-height: 92vh; overflow-y: auto;
+}
+@keyframes up { from { transform: translateY(20px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* Gold top bar on modal */
+.modal::before {
+  content: ''; display: block;
+  height: 2px; margin: -30px -30px 28px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  border-radius: 14px 14px 0 0;
+}
+
+.modal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 24px;
+}
+.modal-head h2 {
+  font-family: var(--font-display);
+  font-size: 22px; font-weight: 900;
+  background: linear-gradient(120deg, var(--gold-light), var(--gold));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.close-btn {
+  background: none; border: none; color: var(--text-muted);
+  cursor: pointer; font-size: 18px; line-height: 1;
+  transition: color .2s; padding: 4px;
+}
+.close-btn:hover { color: var(--text); }
+
+/* Form sections */
+.form-section {
+  border: 1px solid var(--border);
+  border-radius: 8px; padding: 16px 16px 6px;
+  margin-bottom: 16px; background: rgba(0,0,0,.2);
+}
+.form-section.consig {
+  border-color: rgba(155,127,212,.2);
+  background: rgba(155,127,212,.03);
+}
+
+.section-label {
+  font-family: var(--font-label); font-size: 10px;
+  font-weight: 700; text-transform: uppercase;
+  letter-spacing: 3px; margin-bottom: 14px;
+}
+.section-label.main   { color: var(--gold-muted); }
+.section-label.consig { color: rgba(155,127,212,.7); }
+
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.field { margin-bottom: 12px; }
+.field label {
+  display: block; font-family: var(--font-label);
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1.5px;
+  color: var(--text-muted); margin-bottom: 7px;
+}
+
+.inp, .sel {
+  width: 100%;
+  background: rgba(0,0,0,.4);
+  border: 1px solid var(--border);
+  border-radius: 6px; padding: 10px 12px;
+  color: var(--text); font-size: 14px;
+  font-family: var(--font-body);
+  transition: border-color .2s;
+}
+.inp:focus, .sel:focus { outline: none; border-color: var(--gold-muted); }
+.sel option { background: var(--bg-3); }
+
+/* Consignado toggle */
+.toggle-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.toggle-lbl { font-family: var(--font-body); font-size: 13px; color: var(--text-muted); }
+.toggle {
+  appearance: none; width: 38px; height: 20px;
+  background: var(--bg-4); border: 1px solid var(--border);
+  border-radius: 20px; cursor: pointer; position: relative;
+  transition: all .2s; flex-shrink: 0;
+}
+.toggle::after {
+  content: ''; position: absolute; top: 3px; left: 3px;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--text-muted); transition: left .2s, background .2s;
+}
+.toggle:checked { background: rgba(155,127,212,.25); border-color: rgba(155,127,212,.5); }
+.toggle:checked::after { left: 21px; background: var(--purple); }
+
+.consig-fields { display: none; }
+.consig-fields.show { display: block; }
+
+.modal-foot {
+  display: flex; gap: 10px; justify-content: flex-end;
+  margin-top: 22px; align-items: center;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+
+/* ═══════════════════════════════════════════════
+   CONFIG BANNER
+   ═══════════════════════════════════════════════ */
+.config-banner {
+  background: rgba(212,97,74,.08); border: 1px solid rgba(212,97,74,.35);
+  border-radius: 8px; padding: 16px 20px; margin-bottom: 24px;
+  font-size: 13px; line-height: 1.7; display: none;
+}
+.config-banner.show { display: block; }
+.config-banner strong { color: var(--red); }
+.config-banner code {
+  background: rgba(0,0,0,.3); border-radius: 4px;
+  padding: 1px 6px; font-size: 12px; color: var(--gold-light);
+}
+
+/* ═══════════════════════════════════════════════
+   TOAST
+   ═══════════════════════════════════════════════ */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--bg-3);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px; padding: 12px 20px; font-size: 14px;
+  font-family: var(--font-body);
+  z-index: 300; transform: translateY(70px); opacity: 0;
+  transition: all .3s; max-width: 300px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.6);
+}
+.toast.show { transform: none; opacity: 1; }
+
+/* ═══════════════════════════════════════════════
+   DIVIDER
+   ═══════════════════════════════════════════════ */
+.divider {
+  height: 1px; margin: 28px 0;
+  background: linear-gradient(90deg, transparent, var(--border-strong), transparent);
+}
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════ */
+@media (max-width: 720px) {
+  .stats { grid-template-columns: repeat(3, 1fr); }
+  .stats .stat:nth-child(4), .stats .stat:nth-child(5) { grid-column: span 1; }
+  .header-month { display: none; }
+  .logo-name { font-size: 22px; }
+  main { padding: 20px 12px 60px; }
+}
+@media (max-width: 480px) {
+  .stats { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════
+     HEADER
+══════════════════════════════════ -->
+<header>
+  <div class="logo">
+    <div class="logo-wordmark">
+      <span class="logo-name">BerBeck</span>
+      <span class="logo-sub">Cervejaria Artesanal</span>
+    </div>
+  </div>
+
+  <div class="header-right">
+    <div class="conn-pill" id="connPill">
+      <span class="conn-dot"></span>
+      <span id="connLabel">Conectando</span>
+    </div>
+    <div class="header-month">
+      <strong id="hMonth">—</strong>
+      <span>Pedidos de Chopp</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════
+     MAIN
+══════════════════════════════════ -->
+<main>
+
+  <div class="config-banner" id="configBanner">
+    ⚠️ <strong>Configuração necessária:</strong>
+    Abra o arquivo <code>index.html</code> e preencha <code>SUPABASE_URL</code> e <code>SUPABASE_ANON_KEY</code>.
+    Veja o guia de instalação.
+  </div>
+
+  <!-- STATS -->
+  <div class="eyebrow">Resumo do mês</div>
+  <div class="stats">
+    <div class="stat"><div class="stat-val" id="sTotal">—</div><div class="stat-lbl">Pedidos</div></div>
+    <div class="stat"><div class="stat-val" id="sLitros">—</div><div class="stat-lbl">Litros Fixos</div></div>
+    <div class="stat"><div class="stat-val" id="sFeitos">—</div><div class="stat-lbl">Realizados</div></div>
+    <div class="stat"><div class="stat-val warn" id="sConsig">—</div><div class="stat-lbl">Consig. Pendente</div></div>
+    <div class="stat"><div class="stat-val" id="sConsigUsado">—</div><div class="stat-lbl">Consig. Usado</div></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <div class="section-title">Pedidos do Mês</div>
+    <button class="btn" onclick="openModal()">+ Novo Pedido</button>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filters">
+    <input class="search" id="searchInput" type="text" placeholder="Buscar cliente..." oninput="render()">
+    <button class="chip active" onclick="setFilter('todos',this)">Todos</button>
+    <button class="chip" onclick="setFilter('realizado',this)">✅ Realizados</button>
+    <button class="chip" onclick="setFilter('pendente',this)">⏳ Pendentes</button>
+    <button class="chip" onclick="setFilter('confirmar',this)">❓ A Confirmar</button>
+    <button class="chip" onclick="setFilter('desistiu',this)">❌ Desistiu</button>
+    <button class="chip" onclick="setFilter('consig_pendente',this)">🟣 Consig. Pendente</button>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Cliente</th>
+          <th>Litros</th>
+          <th>Status</th>
+          <th class="cg">Consignado</th>
+          <th class="cg">Status Consig.</th>
+          <th>Horário</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="center-msg" id="centerMsg">
+      <div class="spinner"></div>
+      <p>Conectando ao banco de dados...</p>
+    </div>
+  </div>
+
+</main>
+
+<!-- ══════════════════════════════════
+     MODAL
+══════════════════════════════════ -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="modalTitle">Novo Pedido</h2>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+
+    <!-- Pedido principal -->
+    <div class="form-section">
+      <div class="section-label main">📦 Pedido Principal</div>
+      <div class="row2">
+        <div class="field">
+          <label>Data de Entrega</label>
+          <input type="date" class="inp" id="fData">
+        </div>
+        <div class="field">
+          <label>Litros</label>
+          <input type="number" class="inp" id="fLitros" placeholder="Ex: 30" min="1">
+        </div>
+      </div>
+      <div class="field">
+        <label>Nome do Cliente</label>
+        <input type="text" class="inp" id="fCliente" placeholder="Ex: Brenda">
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Status</label>
+          <select class="sel" id="fStatus">
+            <option value="pendente">⏳ Pendente</option>
+            <option value="realizado">✅ Realizado</option>
+            <option value="confirmar">❓ A Confirmar</option>
+            <option value="desistiu">❌ Desistiu</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Horário / Obs</label>
+          <input type="text" class="inp" id="fHorario" placeholder="Ex: 10:00 manhã">
+        </div>
+      </div>
+      <div class="field">
+        <label>Notas</label>
+        <input type="text" class="inp" id="fNota" placeholder="Observações adicionais...">
+      </div>
+    </div>
+
+    <!-- Consignado -->
+    <div class="form-section consig">
+      <div class="section-label consig">🟣 Consignado</div>
+      <div class="toggle-row">
+        <input type="checkbox" class="toggle" id="fConsigToggle" onchange="toggleConsig()">
+        <span class="toggle-lbl">Este pedido tem litros consignados?</span>
+      </div>
+      <div class="consig-fields" id="consigFields">
+        <div class="row2">
+          <div class="field">
+            <label>Litros Consignados</label>
+            <input type="number" class="inp" id="fConsigLitros" placeholder="Ex: 10" min="1">
+          </div>
+          <div class="field">
+            <label>Status Consignado</label>
+            <select class="sel" id="fConsigStatus">
+              <option value="pendente">🟣 Pendente</option>
+              <option value="usado">✅ Usado</option>
+              <option value="devolvido">↩️ Devolvido</option>
+              <option value="nao_requisitado">— Não Requisitado</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn btn-danger btn-sm" id="delBtn" onclick="deleteOrder()" style="display:none">Excluir</button>
+      <div style="flex:1"></div>
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn" id="saveBtn" onclick="saveOrder()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════════════════════════
+     SCRIPT
+══════════════════════════════════ -->
+<script>
+// ┌─────────────────────────────────────────────────────────┐
+// │  🔧 CONFIGURAÇÃO — preencha com seus dados do Supabase  │
+// └─────────────────────────────────────────────────────────┘
+const SUPABASE_URL      = 'https://fsgdsrdgocaokmuifzpm.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZzZ2RzcmRnb2Nhb2ttdWlmenBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MjI4NTEsImV4cCI6MjA4OTQ5ODg1MX0.vlx8wF4bs2WR8kOMhS3qtqMw-dDY-yK_xR8oRmVcCN4';
+// ──────────────────────────────────────────────────────────
+
+const TABLE = 'pedidos';
+let db, orders = [], currentFilter = 'todos', editingId = null;
+
+async function init() {
+  if (SUPABASE_URL === 'COLE_SUA_URL_AQUI') {
+    document.getElementById('configBanner').classList.add('show');
+    showMsg('⚙️', 'Configure o Supabase primeiro');
+    setConn('offline'); return;
+  }
+  try {
+    db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    await fetchOrders();
+    setConn('online');
+    db.channel('pedidos')
+      .on('postgres_changes', { event: '*', schema: 'public', table: TABLE }, () => fetchOrders())
+      .subscribe();
+  } catch(e) {
+    setConn('offline');
+    showMsg('⚠️', 'Erro ao conectar');
+    console.error(e);
+  }
+}
+
+async function fetchOrders() {
+  const { data, error } = await db.from(TABLE).select('*').order('data');
+  if (error) { console.error(error); return; }
+  orders = data || [];
+  render(); updateStats(); updateMonth();
+}
+
+// ── RENDER ────────────────────────────────────────────────
+const CONSIG_MAP = {
+  pendente:        ['cp-pendente',  '🟣 Pendente'],
+  usado:           ['cp-usado',     '✅ Usado'],
+  devolvido:       ['cp-devolvido', '↩️ Devolvido'],
+  nao_requisitado: ['cp-nao_req',   '— Não Req.'],
+};
+
+function render() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const rows = orders.filter(o => {
+    const matchQ = !q || o.cliente.toLowerCase().includes(q) || (o.nota||'').toLowerCase().includes(q);
+    let matchF = true;
+    if      (currentFilter === 'consig_pendente') matchF = !!o.litros_consignado && o.status_consignado === 'pendente';
+    else if (currentFilter !== 'todos')           matchF = o.status === currentFilter;
+    return matchQ && matchF;
+  });
+
+  const tbody = document.getElementById('tbody');
+  const msg   = document.getElementById('centerMsg');
+
+  if (!rows.length) {
+    tbody.innerHTML = '';
+    msg.style.display = 'block';
+    msg.innerHTML = '<div class="icon">🍺</div><p>Nenhum pedido encontrado</p>';
+    return;
+  }
+  msg.style.display = 'none';
+
+  tbody.innerHTML = rows.map(o => {
+    const hasC = !!o.litros_consignado;
+    const [cCls, cLbl] = hasC ? (CONSIG_MAP[o.status_consignado] || CONSIG_MAP['pendente']) : [];
+    return `
+    <tr class="row" onclick="openModal(${o.id})">
+      <td><span class="date-cell">${fmtDate(o.data)}</span></td>
+      <td>
+        <div class="client-name">${esc(o.cliente)}</div>
+        ${o.nota ? `<div class="client-sub">${esc(o.nota)}</div>` : ''}
+      </td>
+      <td>${o.litros ? `<span class="liters">🍺 ${o.litros}L</span>` : '<span class="muted">—</span>'}</td>
+      <td>${statusBadge(o.status)}</td>
+      <td class="cg">${hasC
+        ? `<span class="liters" style="background:rgba(155,127,212,.1);border-color:rgba(155,127,212,.3);color:#B89EE0">🟣 ${o.litros_consignado}L</span>`
+        : '<span class="muted">—</span>'}</td>
+      <td class="cg">${hasC ? `<span class="cpill ${cCls}">${cLbl}</span>` : '<span class="muted">—</span>'}</td>
+      <td>${o.horario ? `<span class="time-tag">🕐 ${esc(o.horario)}</span>` : '<span class="muted">—</span>'}</td>
+      <td onclick="event.stopPropagation()" style="white-space:nowrap;display:flex;gap:5px;align-items:center;min-height:50px">
+        ${o.status !== 'realizado'
+          ? `<button class="btn btn-sm" onclick="quickDone(${o.id})">✅</button>` : ''}
+        ${hasC && o.status_consignado === 'pendente'
+          ? `<button class="btn btn-sm btn-ghost" style="border-color:rgba(155,127,212,.4);color:#B89EE0" onclick="quickConsig(${o.id})">🟣</button>` : ''}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function updateStats() {
+  const cp = orders.filter(o => o.litros_consignado && o.status_consignado === 'pendente');
+  const cu = orders.filter(o => o.litros_consignado && o.status_consignado === 'usado');
+  document.getElementById('sTotal').textContent       = orders.length;
+  document.getElementById('sLitros').textContent      = orders.reduce((s,o) => s+(o.litros||0), 0);
+  document.getElementById('sFeitos').textContent      = orders.filter(o => o.status==='realizado').length;
+  document.getElementById('sConsig').textContent      = cp.reduce((s,o) => s+(o.litros_consignado||0), 0) + 'L';
+  document.getElementById('sConsigUsado').textContent = cu.reduce((s,o) => s+(o.litros_consignado||0), 0) + 'L';
+}
+
+function updateMonth() {
+  const dates = orders.map(o => o.data).filter(Boolean).sort();
+  if (!dates.length) return;
+  const d = new Date(dates[0]+'T12:00:00');
+  document.getElementById('hMonth').textContent =
+    d.toLocaleDateString('pt-BR', { month:'long', year:'numeric' }).replace(/^\w/, c => c.toUpperCase());
+}
+
+// ── FILTERS ───────────────────────────────────────────────
+function setFilter(f, el) {
+  currentFilter = f;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  render();
+}
+
+// ── MODAL ─────────────────────────────────────────────────
+function toggleConsig() {
+  document.getElementById('consigFields').classList
+    .toggle('show', document.getElementById('fConsigToggle').checked);
+}
+
+function openModal(id) {
+  editingId = id || null;
+  document.getElementById('delBtn').style.display  = id ? 'inline-flex' : 'none';
+  document.getElementById('modalTitle').textContent = id ? 'Editar Pedido' : 'Novo Pedido';
+
+  if (id) {
+    const o = orders.find(x => x.id === id); if (!o) return;
+    document.getElementById('fData').value           = o.data || '';
+    document.getElementById('fCliente').value        = o.cliente || '';
+    document.getElementById('fLitros').value         = o.litros || '';
+    document.getElementById('fStatus').value         = o.status || 'pendente';
+    document.getElementById('fHorario').value        = o.horario || '';
+    document.getElementById('fNota').value           = o.nota || '';
+    const hc = !!o.litros_consignado;
+    document.getElementById('fConsigToggle').checked = hc;
+    document.getElementById('consigFields').classList.toggle('show', hc);
+    document.getElementById('fConsigLitros').value   = o.litros_consignado || '';
+    document.getElementById('fConsigStatus').value   = o.status_consignado || 'pendente';
+  } else {
+    document.getElementById('fData').value           = today();
+    document.getElementById('fCliente').value        = '';
+    document.getElementById('fLitros').value         = '';
+    document.getElementById('fStatus').value         = 'pendente';
+    document.getElementById('fHorario').value        = '';
+    document.getElementById('fNota').value           = '';
+    document.getElementById('fConsigToggle').checked = false;
+    document.getElementById('consigFields').classList.remove('show');
+    document.getElementById('fConsigLitros').value   = '';
+    document.getElementById('fConsigStatus').value   = 'pendente';
+  }
+  document.getElementById('overlay').classList.add('open');
+  setTimeout(() => document.getElementById('fCliente').focus(), 80);
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+  editingId = null;
+}
+
+async function saveOrder() {
+  const cliente = document.getElementById('fCliente').value.trim();
+  if (!cliente) { toast('⚠️ Informe o nome do cliente'); return; }
+  const hc = document.getElementById('fConsigToggle').checked;
+  const cl = parseInt(document.getElementById('fConsigLitros').value) || null;
+  if (hc && !cl) { toast('⚠️ Informe a quantidade consignada'); return; }
+
+  const payload = {
+    data:              document.getElementById('fData').value || null,
+    cliente,
+    litros:            parseInt(document.getElementById('fLitros').value) || null,
+    status:            document.getElementById('fStatus').value,
+    horario:           document.getElementById('fHorario').value.trim() || null,
+    nota:              document.getElementById('fNota').value.trim() || null,
+    litros_consignado: hc ? cl : null,
+    status_consignado: hc ? document.getElementById('fConsigStatus').value : null,
+  };
+
+  setBusy(true);
+  let error;
+  if (editingId) {
+    ({ error } = await db.from(TABLE).update(payload).eq('id', editingId));
+    if (!error) toast('✅ Pedido atualizado!');
+  } else {
+    ({ error } = await db.from(TABLE).insert(payload));
+    if (!error) toast('🍺 Pedido adicionado!');
+  }
+  setBusy(false);
+  if (error) { toast('❌ Erro: ' + error.message); return; }
+  closeModal(); await fetchOrders();
+}
+
+async function deleteOrder() {
+  if (!editingId || !confirm('Excluir este pedido?')) return;
+  const { error } = await db.from(TABLE).delete().eq('id', editingId);
+  if (error) { toast('❌ Erro ao excluir'); return; }
+  toast('🗑️ Pedido excluído');
+  closeModal(); await fetchOrders();
+}
+
+async function quickDone(id) {
+  const { error } = await db.from(TABLE).update({ status: 'realizado' }).eq('id', id);
+  if (!error) { toast('✅ Realizado!'); await fetchOrders(); }
+}
+
+function quickConsig(id) {
+  openModal(id);
+  setTimeout(() => {
+    document.getElementById('fConsigStatus').focus();
+    document.getElementById('fConsigStatus').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 120);
+}
+
+// ── HELPERS ───────────────────────────────────────────────
+function statusBadge(s) {
+  const m = { realizado:['b-done','✅ Realizado'], pendente:['b-pending','⏳ Pendente'], confirmar:['b-confirm','❓ A Confirmar'], desistiu:['b-cancel','❌ Desistiu'] };
+  const [cls, lbl] = m[s] || ['b-pending', s];
+  return `<span class="badge ${cls}">${lbl}</span>`;
+}
+function fmtDate(d) {
+  if (!d) return '—';
+  const [,m,day] = d.split('-');
+  return `${day}/${m}`;
+}
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function today() { return new Date().toISOString().split('T')[0]; }
+
+function setConn(state) {
+  const el = document.getElementById('connPill');
+  el.className = 'conn-pill ' + state;
+  document.getElementById('connLabel').textContent = state === 'online' ? 'Online' : 'Offline';
+}
+function showMsg(icon, txt) {
+  document.getElementById('tbody').innerHTML = '';
+  const m = document.getElementById('centerMsg');
+  m.style.display = 'block';
+  m.innerHTML = `<div class="icon">${icon}</div><p>${txt}</p>`;
+}
+function setBusy(b) {
+  document.getElementById('saveBtn').disabled    = b;
+  document.getElementById('saveBtn').textContent = b ? 'Salvando...' : 'Salvar';
+}
+let _tt;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(_tt); _tt = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+document.getElementById('overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('overlay')) closeModal();
+});
+
+init();
+</script>
+</body>
+</html>
