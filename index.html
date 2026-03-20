@@ -1,303 +1,22 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<link rel="icon" type="image/png" href="logo.jpg">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BerBeck — Pedidos de Chopp</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<style>
-:root {
-  --gold:          #C9A84C;
-  --gold-light:    #DFC278;
-  --gold-dim:      #A8893C;
-  --gold-muted:    #6B5520;
-  --gold-faint:    rgba(201,168,76,0.12);
-  --bg:            #0A0A08;
-  --bg-1:          #100F0C;
-  --bg-2:          #171510;
-  --bg-3:          #1F1C14;
-  --bg-4:          #28231A;
-  --text:          #EDE5CC;
-  --text-muted:    #7A6840;
-  --green:         #6BBF7A;
-  --blue:          #6AAAD4;
-  --red:           #D4614A;
-  --orange:        #D4904A;
-  --purple:        #9B7FD4;
-  --pilsen-color:  #D4B84A;
-  --pale-color:    #8FBF6A;
-  --red-color:     #C4504A;
-  --border:        rgba(201,168,76,0.15);
-  --border-strong: rgba(201,168,76,0.35);
-  --card:          rgba(23,21,16,0.95);
-  --font-display: 'Playfair Display', Georgia, serif;
-  --font-label:   'Barlow Condensed', sans-serif;
-  --font-body:    'Barlow', sans-serif;
-}
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh;
-  background-image: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201,168,76,0.06) 0%, transparent 60%);
-}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="logo.jpg">
+  <title>BerBeck — Pedidos de Chopp</title>
 
-/* ══ LOGIN ══ */
-#loginScreen { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
-.login-card { background:var(--bg-2); border:1px solid var(--border-strong); border-radius:16px; padding:40px 36px; width:100%; max-width:380px; box-shadow:0 40px 80px rgba(0,0,0,.7); position:relative; overflow:hidden; animation:up .3s ease; }
-.login-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--gold),transparent); }
-.login-logo { text-align:center; margin-bottom:32px; }
-.login-logo-name { font-family:var(--font-display); font-weight:900; font-size:42px; letter-spacing:4px; background:linear-gradient(160deg,var(--gold-light) 0%,var(--gold) 45%,var(--gold-dim) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; text-transform:uppercase; display:block; }
-.login-logo-sub { font-family:var(--font-label); font-size:10px; font-weight:700; letter-spacing:5px; color:var(--text-muted); text-transform:uppercase; display:block; margin-top:6px; }
-.login-divider { height:1px; margin:0 auto 28px; background:linear-gradient(90deg,transparent,var(--border-strong),transparent); }
-.login-field { margin-bottom:16px; }
-.login-field label { display:block; font-family:var(--font-label); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:var(--text-muted); margin-bottom:8px; }
-.login-inp { width:100%; background:rgba(0,0,0,.4); border:1px solid var(--border); border-radius:8px; padding:12px 14px; color:var(--text); font-size:15px; font-family:var(--font-body); transition:border-color .2s; }
-.login-inp:focus { outline:none; border-color:var(--gold-muted); }
-.login-inp::placeholder { color:var(--text-muted); }
-.login-btn { width:100%; margin-top:8px; background:linear-gradient(135deg,var(--gold-light) 0%,var(--gold) 60%,var(--gold-dim) 100%); color:var(--bg); border:none; border-radius:8px; padding:13px; font-family:var(--font-label); font-weight:700; font-size:14px; letter-spacing:2px; text-transform:uppercase; cursor:pointer; transition:filter .15s,transform .1s; box-shadow:0 4px 20px rgba(201,168,76,.25); }
-.login-btn:hover { filter:brightness(1.08); }
-.login-btn:disabled { opacity:.5; cursor:not-allowed; }
-.login-error { background:rgba(212,97,74,.1); border:1px solid rgba(212,97,74,.35); border-radius:6px; padding:10px 14px; margin-top:14px; font-size:13px; color:var(--red); text-align:center; display:none; }
-.login-error.show { display:block; animation:shake .3s ease; }
-@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
-@keyframes up { from{transform:translateY(24px);opacity:0} to{transform:none;opacity:1} }
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-/* ══ APP ══ */
-#app { display:none; }
-
-/* ── HEADER ── */
-header { position:sticky; top:0; z-index:50; background:var(--bg-1); border-bottom:1px solid var(--border-strong); box-shadow:0 -3px 0 0 var(--gold) inset,0 4px 40px rgba(0,0,0,.8); padding:0 28px; height:68px; display:flex; align-items:center; justify-content:space-between; }
-.logo { display:flex; align-items:center; gap:14px; }
-.logo-wordmark { display:flex; flex-direction:column; line-height:1; }
-.logo-name { font-family:var(--font-display); font-weight:900; font-size:28px; letter-spacing:3px; background:linear-gradient(160deg,var(--gold-light) 0%,var(--gold) 45%,var(--gold-dim) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; text-transform:uppercase; }
-.logo-sub { font-family:var(--font-label); font-weight:600; font-size:9px; letter-spacing:4px; color:var(--text-muted); text-transform:uppercase; margin-top:3px; }
-.header-right { display:flex; align-items:center; gap:12px; }
-.conn-pill { display:flex; align-items:center; gap:7px; background:var(--bg-3); border:1px solid var(--border); border-radius:20px; padding:5px 12px; font-family:var(--font-label); font-size:12px; letter-spacing:1px; color:var(--text-muted); transition:border-color .3s,color .3s; }
-.conn-pill.online  { border-color:rgba(107,191,122,.4); color:var(--green); }
-.conn-pill.offline { border-color:rgba(212,97,74,.4);   color:var(--red); }
-.conn-dot { width:6px; height:6px; border-radius:50%; background:currentColor; }
-.conn-pill.online  .conn-dot { box-shadow:0 0 6px var(--green); }
-.conn-pill.offline .conn-dot { box-shadow:0 0 6px var(--red); }
-.header-month { font-family:var(--font-label); letter-spacing:1px; text-align:right; }
-.header-month strong { display:block; color:var(--gold-light); font-size:14px; font-weight:700; }
-.header-month span { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:2px; }
-.user-pill { display:flex; align-items:center; gap:8px; background:var(--bg-3); border:1px solid var(--border); border-radius:20px; padding:5px 14px 5px 10px; font-family:var(--font-label); font-size:12px; letter-spacing:.5px; color:var(--text-muted); cursor:pointer; transition:border-color .2s,color .2s; }
-.user-pill:hover { border-color:var(--border-strong); color:var(--text); }
-.user-avatar { width:22px; height:22px; border-radius:50%; background:linear-gradient(135deg,var(--gold-dim),var(--gold)); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--bg); font-family:var(--font-label); }
-
-/* ── MAIN ── */
-main { max-width:1280px; margin:0 auto; padding:32px 20px 80px; }
-
-/* ── EYEBROW ── */
-.eyebrow { font-family:var(--font-label); font-size:10px; font-weight:700; letter-spacing:4px; text-transform:uppercase; color:var(--text-muted); display:flex; align-items:center; gap:10px; margin-bottom:16px; }
-.eyebrow::before { content:''; flex:1; height:1px; background:linear-gradient(90deg,var(--border-strong),transparent); }
-.eyebrow::after  { content:''; flex:1; height:1px; background:linear-gradient(90deg,transparent,var(--border-strong)); }
-
-/* ── ESTOQUE 3-TYPE ── */
-.estoque-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:8px; }
-.est-card {
-  background:var(--card); border:1px solid var(--border); border-radius:12px;
-  padding:18px 20px; position:relative; overflow:hidden;
-  transition:border-color .2s, transform .2s;
-}
-.est-card:hover { transform:translateY(-2px); }
-.est-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
-.est-card.pilsen  { border-color:rgba(212,184,74,.25); }
-.est-card.pilsen::before  { background:linear-gradient(90deg,transparent,var(--pilsen-color),transparent); }
-.est-card.pale_ale{ border-color:rgba(143,191,106,.25); }
-.est-card.pale_ale::before{ background:linear-gradient(90deg,transparent,var(--pale-color),transparent); }
-.est-card.red     { border-color:rgba(196,80,74,.25); }
-.est-card.red::before     { background:linear-gradient(90deg,transparent,var(--red-color),transparent); }
-
-.est-card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
-.est-type-badge { font-family:var(--font-label); font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; padding:3px 10px; border-radius:4px; }
-.est-type-badge.pilsen   { background:rgba(212,184,74,.12); color:var(--pilsen-color); border:1px solid rgba(212,184,74,.3); }
-.est-type-badge.pale_ale { background:rgba(143,191,106,.12); color:var(--pale-color);   border:1px solid rgba(143,191,106,.3); }
-.est-type-badge.red      { background:rgba(196,80,74,.12);   color:var(--red-color);    border:1px solid rgba(196,80,74,.3); }
-
-.est-add-btn { background:none; border:1px solid var(--border); border-radius:5px; color:var(--text-muted); padding:4px 10px; font-size:11px; font-family:var(--font-label); letter-spacing:1px; cursor:pointer; transition:all .15s; text-transform:uppercase; }
-.est-add-btn:hover { border-color:var(--gold-muted); color:var(--text); }
-
-.est-nums { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
-.est-num-block { text-align:center; }
-.est-num-val { font-family:var(--font-display); font-weight:900; font-size:24px; line-height:1; }
-.est-num-val.gold   { background:linear-gradient(160deg,var(--gold-light),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-.est-num-val.warn   { background:linear-gradient(160deg,#F0C060,var(--orange)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-.est-num-val.danger { background:linear-gradient(160deg,#F08060,var(--red));    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-.est-num-val.safe   { background:linear-gradient(160deg,#90D4A0,var(--green));  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-.est-num-lbl { font-family:var(--font-label); font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--text-muted); margin-top:4px; }
-
-.est-bar-track { height:3px; background:rgba(255,255,255,.06); border-radius:3px; overflow:hidden; margin-top:12px; }
-.est-bar-fill  { height:100%; border-radius:3px; transition:width .6s ease; }
-.est-bar-fill.pilsen  { background:linear-gradient(90deg,#8B7020,var(--pilsen-color)); }
-.est-bar-fill.pale_ale{ background:linear-gradient(90deg,#4A8A30,var(--pale-color)); }
-.est-bar-fill.red     { background:linear-gradient(90deg,#8A2020,var(--red-color)); }
-.est-bar-fill.warn    { background:linear-gradient(90deg,#B07020,var(--orange)); }
-.est-bar-fill.danger  { background:linear-gradient(90deg,#B03020,var(--red)); }
-
-/* ── STATS ── */
-.stats { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-bottom:36px; }
-.stat { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:18px 14px 14px; text-align:center; position:relative; overflow:hidden; transition:border-color .2s,transform .2s; }
-.stat::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--gold),transparent); opacity:0; transition:opacity .2s; }
-.stat:hover { border-color:var(--border-strong); transform:translateY(-2px); }
-.stat:hover::before { opacity:1; }
-.stat-val { font-family:var(--font-display); font-weight:900; font-size:34px; line-height:1; background:linear-gradient(160deg,var(--gold-light),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-.stat-val.warn { background:linear-gradient(160deg,#F0A860,var(--orange)); -webkit-background-clip:text; background-clip:text; }
-.stat-lbl { font-family:var(--font-label); font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:var(--text-muted); margin-top:6px; }
-
-/* ── TOOLBAR ── */
-.toolbar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:16px; }
-.section-title { font-family:var(--font-display); font-size:20px; font-weight:700; background:linear-gradient(120deg,var(--gold-light),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-.toolbar-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-
-/* ── BUTTONS ── */
-.btn { background:linear-gradient(135deg,var(--gold-light) 0%,var(--gold) 60%,var(--gold-dim) 100%); color:var(--bg); border:none; border-radius:6px; padding:10px 22px; font-family:var(--font-label); font-weight:700; font-size:13px; letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; display:inline-flex; align-items:center; gap:7px; transition:filter .15s,transform .1s; box-shadow:0 2px 12px rgba(201,168,76,.2); }
-.btn:hover   { filter:brightness(1.1); }
-.btn:active  { transform:scale(.97); }
-.btn:disabled{ opacity:.4; cursor:not-allowed; }
-.btn-ghost { background:transparent; border:1px solid var(--border-strong); color:var(--gold); box-shadow:none; }
-.btn-ghost:hover { background:var(--gold-faint); filter:none; }
-.btn-sm { padding:5px 12px; font-size:11px; letter-spacing:1px; border-radius:5px; }
-.btn-danger { background:linear-gradient(135deg,#E07060,var(--red)); color:#fff; box-shadow:none; }
-.btn-danger:hover { filter:brightness(1.1); }
-.btn-green { background:linear-gradient(135deg,#7AD48A,var(--green)); color:var(--bg); }
-
-/* ── FILTERS ── */
-.filters { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:16px; }
-.chip { background:transparent; border:1px solid var(--border); color:var(--text-muted); border-radius:4px; padding:5px 14px; font-family:var(--font-label); font-size:12px; font-weight:600; letter-spacing:1px; text-transform:uppercase; cursor:pointer; transition:all .15s; }
-.chip:hover  { border-color:var(--gold-muted); color:var(--text); }
-.chip.active { background:linear-gradient(135deg,var(--gold-light),var(--gold-dim)); border-color:transparent; color:var(--bg); font-weight:700; }
-.search { background:var(--bg-2); border:1px solid var(--border); border-radius:6px; padding:7px 13px; color:var(--text); font-family:var(--font-body); font-size:13px; width:200px; transition:border-color .2s; }
-.search:focus { outline:none; border-color:var(--gold-muted); }
-.search::placeholder { color:var(--text-muted); }
-
-/* ── TABLE ── */
-.table-wrap { background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden; overflow-x:auto; box-shadow:0 8px 40px rgba(0,0,0,.5); }
-table { width:100%; border-collapse:collapse; min-width:860px; }
-thead { background:var(--bg-3); border-bottom:1px solid var(--border-strong); }
-th { padding:12px 16px; text-align:left; font-family:var(--font-label); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:var(--text-muted); white-space:nowrap; }
-td { padding:12px 16px; font-size:14px; border-bottom:1px solid rgba(201,168,76,.06); vertical-align:middle; }
-tr:last-child td { border-bottom:none; }
-tr.row { cursor:pointer; transition:background .12s; }
-tr.row:hover { background:rgba(201,168,76,.04); }
-tr.row:hover td:first-child { box-shadow:inset 3px 0 0 var(--gold); }
-.client-name { font-weight:600; color:var(--text); }
-.client-sub  { font-size:11px; color:var(--text-muted); margin-top:2px; font-style:italic; }
-.date-cell { font-family:var(--font-label); font-size:13px; letter-spacing:1px; color:var(--text-muted); }
-
-/* Type pills in table */
-.tipo-pill { display:inline-flex; align-items:center; gap:3px; border-radius:4px; padding:2px 8px; font-family:var(--font-label); font-weight:700; font-size:11px; letter-spacing:.5px; white-space:nowrap; margin:2px 2px 2px 0; }
-.tp-pilsen   { background:rgba(212,184,74,.1);  border:1px solid rgba(212,184,74,.3);  color:var(--pilsen-color); }
-.tp-pale_ale { background:rgba(143,191,106,.1); border:1px solid rgba(143,191,106,.3); color:var(--pale-color); }
-.tp-red      { background:rgba(196,80,74,.1);   border:1px solid rgba(196,80,74,.3);   color:var(--red-color); }
-
-.badge { display:inline-flex; align-items:center; gap:5px; border-radius:20px; padding:3px 12px; font-family:var(--font-label); font-size:11px; font-weight:700; letter-spacing:.5px; white-space:nowrap; }
-.b-done    { background:rgba(107,191,122,.1); border:1px solid rgba(107,191,122,.3); color:var(--green); }
-.b-pending { background:rgba(106,170,212,.1); border:1px solid rgba(106,170,212,.3); color:var(--blue); }
-.b-confirm { background:rgba(201,168,76,.1);  border:1px solid rgba(201,168,76,.3);  color:var(--gold); }
-.b-cancel  { background:rgba(212,97,74,.08);  border:1px solid rgba(212,97,74,.25);  color:var(--red); }
-
-.chopeira-icon { font-size:16px; }
-.valor-cell { font-family:var(--font-label); font-weight:700; font-size:13px; color:var(--gold-light); letter-spacing:.5px; }
-.muted { color:var(--text-muted); }
-.time-tag { font-size:12px; color:var(--text-muted); font-family:var(--font-label); }
-
-/* ── LOADING / EMPTY ── */
-.center-msg { text-align:center; padding:56px 24px; color:var(--text-muted); }
-.center-msg .icon { font-size:40px; margin-bottom:14px; opacity:.6; }
-.center-msg p { font-family:var(--font-label); font-size:13px; letter-spacing:2px; text-transform:uppercase; }
-.spinner { display:inline-block; width:32px; height:32px; border:2px solid var(--border); border-top-color:var(--gold); border-radius:50%; animation:spin .8s linear infinite; margin-bottom:14px; }
-@keyframes spin { to{transform:rotate(360deg)} }
-
-/* ── OVERLAY / MODAL ── */
-.overlay { display:none; position:fixed; inset:0; background:rgba(5,4,2,.92); z-index:200; align-items:center; justify-content:center; backdrop-filter:blur(6px); padding:16px; }
-.overlay.open { display:flex; }
-.modal { background:var(--bg-2); border:1px solid var(--border-strong); border-radius:14px; padding:30px; width:100%; max-width:560px; box-shadow:0 30px 80px rgba(0,0,0,.8); animation:up .22s ease; max-height:92vh; overflow-y:auto; }
-.modal.wide { max-width:680px; }
-.modal::before { content:''; display:block; height:2px; margin:-30px -30px 28px; background:linear-gradient(90deg,transparent,var(--gold),transparent); border-radius:14px 14px 0 0; }
-.modal-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
-.modal-head h2 { font-family:var(--font-display); font-size:22px; font-weight:900; background:linear-gradient(120deg,var(--gold-light),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-.close-btn { background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:18px; line-height:1; transition:color .2s; padding:4px; }
-.close-btn:hover { color:var(--text); }
-
-.form-section { border:1px solid var(--border); border-radius:8px; padding:16px 16px 6px; margin-bottom:16px; background:rgba(0,0,0,.2); }
-.section-label { font-family:var(--font-label); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:3px; margin-bottom:14px; color:var(--gold-muted); }
-.section-label.items  { color:rgba(143,191,106,.8); }
-.section-label.consig { color:rgba(155,127,212,.7); }
-
-.row2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-.row3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
-.field { margin-bottom:12px; }
-.field label { display:block; font-family:var(--font-label); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--text-muted); margin-bottom:7px; }
-.inp, .sel { width:100%; background:rgba(0,0,0,.4); border:1px solid var(--border); border-radius:6px; padding:10px 12px; color:var(--text); font-size:14px; font-family:var(--font-body); transition:border-color .2s; }
-.inp:focus, .sel:focus { outline:none; border-color:var(--gold-muted); }
-.sel option { background:var(--bg-3); }
-.inp-sm { padding:7px 10px; font-size:13px; }
-
-/* Item rows in form */
-.item-rows { display:flex; flex-direction:column; gap:8px; margin-bottom:10px; }
-.item-row { display:grid; grid-template-columns:1fr 80px 80px 80px 28px; gap:8px; align-items:center; background:rgba(0,0,0,.2); border:1px solid var(--border); border-radius:6px; padding:8px 10px; }
-.item-row-label { font-family:var(--font-label); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-bottom:4px; }
-.remove-item-btn { background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:16px; line-height:1; transition:color .2s; padding:2px; display:flex; align-items:center; justify-content:center; }
-.remove-item-btn:hover { color:var(--red); }
-.add-item-btn { background:transparent; border:1px dashed var(--border); border-radius:6px; padding:8px; color:var(--text-muted); font-family:var(--font-label); font-size:12px; letter-spacing:1px; text-transform:uppercase; cursor:pointer; width:100%; transition:all .15s; text-align:center; }
-.add-item-btn:hover { border-color:var(--gold-muted); color:var(--gold); }
-
-/* Consig status select per item */
-.consig-status-sel { display:none; }
-.consig-status-sel.show { display:block; }
-
-/* Checkbox toggle */
-.check-row { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
-.check-box { width:18px; height:18px; accent-color:var(--gold); cursor:pointer; }
-.check-lbl { font-size:14px; color:var(--text-muted); font-family:var(--font-body); }
-
-.modal-foot { display:flex; gap:10px; justify-content:flex-end; margin-top:22px; align-items:center; padding-top:18px; border-top:1px solid var(--border); }
-
-/* ── VIEW MODAL ── */
-.view-section { margin-bottom:20px; }
-.view-section-title { font-family:var(--font-label); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:3px; color:var(--text-muted); margin-bottom:12px; display:flex; align-items:center; gap:8px; }
-.view-section-title::after { content:''; flex:1; height:1px; background:var(--border); }
-.view-row { display:flex; justify-content:space-between; align-items:flex-start; padding:8px 0; border-bottom:1px solid rgba(255,255,255,.04); gap:12px; }
-.view-row:last-child { border-bottom:none; }
-.view-lbl { font-family:var(--font-label); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); white-space:nowrap; }
-.view-val { font-size:14px; color:var(--text); text-align:right; }
-.view-val.accent { color:var(--gold-light); font-weight:600; }
-
-/* Item cards in view modal */
-.item-card { background:rgba(0,0,0,.25); border:1px solid var(--border); border-radius:8px; padding:12px 14px; margin-bottom:8px; }
-.item-card-header { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
-.item-detail-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:13px; }
-.item-detail-cell { display:flex; flex-direction:column; gap:2px; }
-.item-detail-lbl { font-family:var(--font-label); font-size:9px; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); }
-.item-detail-val { color:var(--text); font-weight:500; }
-
-/* ── EXPORT MODAL ── */
-.date-range { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
-
-/* ── ESTOQUE MODAL ── */
-.est-modal-info { background:rgba(0,0,0,.2); border:1px solid var(--border); border-radius:8px; padding:14px 16px; margin-bottom:16px; }
-.est-modal-row { display:flex; justify-content:space-between; align-items:center; padding:5px 0; border-bottom:1px solid rgba(255,255,255,.04); font-size:13px; }
-.est-modal-row:last-child { border-bottom:none; }
-.est-modal-total { color:var(--gold-light); font-weight:700; font-size:15px; }
-
-/* ── TOAST ── */
-.toast { position:fixed; bottom:24px; right:24px; background:var(--bg-3); border:1px solid var(--border-strong); border-radius:8px; padding:12px 20px; font-size:14px; font-family:var(--font-body); z-index:300; transform:translateY(70px); opacity:0; transition:all .3s; max-width:300px; box-shadow:0 8px 30px rgba(0,0,0,.6); }
-.toast.show { transform:none; opacity:1; }
-
-/* ── DIVIDER ── */
-.divider { height:1px; margin:28px 0; background:linear-gradient(90deg,transparent,var(--border-strong),transparent); }
-
-/* ── RESPONSIVE ── */
-@media (max-width:900px) { .estoque-grid{grid-template-columns:1fr} .stats{grid-template-columns:repeat(3,1fr)} }
-@media (max-width:720px) { .header-month{display:none} .logo-name{font-size:22px} main{padding:20px 12px 60px} .stats{grid-template-columns:repeat(2,1fr)} }
-</style>
+  <!-- App styles -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- ══ LOGIN ══ -->
+<!-- ══════════════════════════════════
+     LOGIN SCREEN
+══════════════════════════════════ -->
 <div id="loginScreen">
   <div class="login-card">
     <div class="login-logo">
@@ -318,86 +37,87 @@ tr.row:hover td:first-child { box-shadow:inset 3px 0 0 var(--gold); }
   </div>
 </div>
 
-<!-- ══ APP ══ -->
+<!-- ══════════════════════════════════
+     APP
+══════════════════════════════════ -->
 <div id="app">
 
-<header>
-  <div class="logo">
-    <div class="logo-wordmark">
-      <span class="logo-name">BerBeck</span>
-      <span class="logo-sub">Cervejaria Artesanal</span>
+  <header>
+    <div class="logo">
+      <div class="logo-wordmark">
+        <span class="logo-name">BerBeck</span>
+        <span class="logo-sub">Cervejaria Artesanal</span>
+      </div>
     </div>
-  </div>
-  <div class="header-right">
-    <div class="conn-pill" id="connPill"><span class="conn-dot"></span><span id="connLabel">Conectando</span></div>
-    <div class="header-month"><strong id="hMonth">—</strong><span>Pedidos de Chopp</span></div>
-    <div class="user-pill" onclick="doLogout()" title="Clique para sair">
-      <div class="user-avatar" id="userAvatar">?</div>
-      <span id="userEmail">—</span>
+    <div class="header-right">
+      <div class="conn-pill" id="connPill"><span class="conn-dot"></span><span id="connLabel">Conectando</span></div>
+      <div class="header-month"><strong id="hMonth">—</strong><span>Pedidos de Chopp</span></div>
+      <div class="user-pill" onclick="doLogout()" title="Clique para sair">
+        <div class="user-avatar" id="userAvatar">?</div>
+        <span id="userEmail">—</span>
+      </div>
     </div>
-  </div>
-</header>
+  </header>
 
-<main>
+  <main>
 
-  <!-- ESTOQUE -->
-  <div class="eyebrow">Estoque por Tipo</div>
-  <div class="estoque-grid" id="estoqueGrid">
-    <!-- Renderizado via JS -->
-  </div>
+    <!-- ESTOQUE -->
+    <div class="eyebrow">Estoque por Tipo</div>
+    <div class="estoque-grid" id="estoqueGrid"></div>
 
-  <div class="divider"></div>
+    <div class="divider"></div>
 
-  <!-- STATS -->
-  <div class="eyebrow">Resumo do Mês</div>
-  <div class="stats">
-    <div class="stat"><div class="stat-val" id="sTotal">—</div><div class="stat-lbl">Pedidos</div></div>
-    <div class="stat"><div class="stat-val" id="sLitros">—</div><div class="stat-lbl">Litros Total</div></div>
-    <div class="stat"><div class="stat-val" id="sFeitos">—</div><div class="stat-lbl">Realizados</div></div>
-    <div class="stat"><div class="stat-val warn" id="sConsig">—</div><div class="stat-lbl">Consig. Pendente</div></div>
-    <div class="stat"><div class="stat-val" id="sValor">—</div><div class="stat-lbl">Valor Total</div></div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- PEDIDOS -->
-  <div class="toolbar">
-    <div class="section-title">Pedidos</div>
-    <div class="toolbar-actions">
-      <button class="btn btn-ghost" onclick="openExportModal()">📊 Exportar Excel</button>
-      <button class="btn" onclick="openEditModal()">+ Novo Pedido</button>
+    <!-- STATS -->
+    <div class="eyebrow">Resumo do Mês</div>
+    <div class="stats">
+      <div class="stat"><div class="stat-val" id="sTotal">—</div><div class="stat-lbl">Pedidos</div></div>
+      <div class="stat"><div class="stat-val" id="sLitros">—</div><div class="stat-lbl">Litros Total</div></div>
+      <div class="stat"><div class="stat-val" id="sFeitos">—</div><div class="stat-lbl">Realizados</div></div>
+      <div class="stat"><div class="stat-val warn" id="sConsig">—</div><div class="stat-lbl">Consig. Pendente</div></div>
+      <div class="stat"><div class="stat-val" id="sValor">—</div><div class="stat-lbl">Valor Total</div></div>
     </div>
-  </div>
 
-  <div class="filters">
-    <input class="search" id="searchInput" type="text" placeholder="Buscar cliente..." oninput="render()">
-    <button class="chip active" onclick="setFilter('todos',this)">Todos</button>
-    <button class="chip" onclick="setFilter('pendente',this)">⏳ Pendentes</button>
-    <button class="chip" onclick="setFilter('realizado',this)">✅ Realizados</button>
-    <button class="chip" onclick="setFilter('confirmar',this)">❓ A Confirmar</button>
-    <button class="chip" onclick="setFilter('desistiu',this)">❌ Desistiu</button>
-  </div>
+    <div class="divider"></div>
 
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>Data</th>
-          <th>Cliente</th>
-          <th>Tipos / Litros</th>
-          <th>Status</th>
-          <th>Chopeira</th>
-          <th>Valor</th>
-          <th>Horário</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="tbody"></tbody>
-    </table>
-    <div class="center-msg" id="centerMsg"><div class="spinner"></div><p>Carregando...</p></div>
-  </div>
+    <!-- PEDIDOS -->
+    <div class="toolbar">
+      <div class="section-title">Pedidos</div>
+      <div class="toolbar-actions">
+        <button class="btn btn-ghost" onclick="openExportModal()">📊 Exportar Excel</button>
+        <button class="btn" onclick="openEditModal()">+ Novo Pedido</button>
+      </div>
+    </div>
 
-</main>
+    <div class="filters">
+      <input class="search" id="searchInput" type="text" placeholder="Buscar cliente..." oninput="render()">
+      <button class="chip active" onclick="setFilter('todos',this)">Todos</button>
+      <button class="chip" onclick="setFilter('pendente',this)">⏳ Pendentes</button>
+      <button class="chip" onclick="setFilter('realizado',this)">✅ Realizados</button>
+      <button class="chip" onclick="setFilter('confirmar',this)">❓ A Confirmar</button>
+      <button class="chip" onclick="setFilter('desistiu',this)">❌ Desistiu</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Cliente</th>
+            <th>Tipos / Litros</th>
+            <th>Status</th>
+            <th>Chopeira</th>
+            <th>Valor</th>
+            <th>Horário</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div class="center-msg" id="centerMsg"><div class="spinner"></div><p>Carregando...</p></div>
+    </div>
+
+  </main>
+
 </div><!-- /#app -->
 
 <!-- ══ VIEW MODAL ══ -->
@@ -409,10 +129,10 @@ tr.row:hover td:first-child { box-shadow:inset 3px 0 0 var(--gold); }
     </div>
     <div id="viewBody"></div>
     <div class="modal-foot">
-      <button class="btn btn-danger btn-sm" id="viewDelBtn" onclick="deleteFromView()">Excluir</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteFromView()">Excluir</button>
       <div style="flex:1"></div>
       <button class="btn btn-ghost" onclick="closeView()">Fechar</button>
-      <button class="btn" id="viewEditBtn" onclick="editFromView()">✏️ Editar</button>
+      <button class="btn" onclick="editFromView()">✏️ Editar</button>
     </div>
   </div>
 </div>
@@ -425,7 +145,6 @@ tr.row:hover td:first-child { box-shadow:inset 3px 0 0 var(--gold); }
       <button class="close-btn" onclick="closeEdit()">✕</button>
     </div>
 
-    <!-- Info principal -->
     <div class="form-section">
       <div class="section-label">📋 Informações do Pedido</div>
       <div class="row3">
@@ -447,14 +166,19 @@ tr.row:hover td:first-child { box-shadow:inset 3px 0 0 var(--gold); }
         <div class="field"><label>Horário / Observação</label><input type="text" class="inp" id="fHorario" placeholder="Ex: 10:00 manhã"></div>
         <div class="field"><label>Notas</label><input type="text" class="inp" id="fNota" placeholder="Observações adicionais..."></div>
       </div>
-      <div class="check-row">
-        <input type="checkbox" class="check-box" id="fChopeira">
-        <span class="check-lbl">Levar chopeira</span>
+      <div style="display:flex;gap:24px;flex-wrap:wrap">
+        <div class="check-row">
+          <input type="checkbox" class="check-box" id="fChopeira">
+          <span class="check-lbl">Levar chopeira</span>
+        </div>
+        <div class="check-row">
+          <input type="checkbox" class="check-box" id="fPago">
+          <span class="check-lbl">Pagamento recebido</span>
+        </div>
       </div>
     </div>
 
-    <!-- Itens de chopp -->
-    <div class="form-section" style="border-color:rgba(143,191,106,.2);background:rgba(143,191,106,.02)">
+    <div class="form-section form-section--items">
       <div class="section-label items">🍺 Itens de Chopp</div>
       <div class="item-rows" id="itemRows"></div>
       <button class="add-item-btn" onclick="addItemRow()">+ Adicionar tipo de chopp</button>
@@ -477,8 +201,8 @@ tr.row:hover td:first-child { box-shadow:inset 3px 0 0 var(--gold); }
       <button class="close-btn" onclick="closeEstoqueModal()">✕</button>
     </div>
     <div class="est-modal-info" id="estModalInfo"></div>
-    <div class="form-section" style="border-color:rgba(107,191,122,.2);background:rgba(107,191,122,.03)">
-      <div class="section-label" style="color:rgba(107,191,122,.8)">🏭 Nova Produção</div>
+    <div class="form-section form-section--stock">
+      <div class="section-label stock">🏭 Nova Produção</div>
       <div class="field"><label>Tipo de Chopp</label>
         <select class="sel" id="fEstTipo" disabled>
           <option value="pilsen">🟡 Pilsen</option>
@@ -517,7 +241,7 @@ tr.row:hover td:first-child { box-shadow:inset 3px 0 0 var(--gold); }
         <div class="field"><label>Data Inicial</label><input type="date" class="inp" id="fExportDe"></div>
         <div class="field"><label>Data Final</label><input type="date" class="inp" id="fExportAte"></div>
       </div>
-      <p style="font-size:12px;color:var(--text-muted);margin-top:-4px">Deixe em branco para exportar todos os pedidos.</p>
+      <p class="export-hint">Deixe em branco para exportar todos os pedidos.</p>
     </div>
     <div class="modal-foot">
       <button class="btn btn-ghost" onclick="closeExport()">Cancelar</button>
@@ -528,633 +252,11 @@ tr.row:hover td:first-child { box-shadow:inset 3px 0 0 var(--gold); }
 
 <div class="toast" id="toast"></div>
 
-<script>
-// ┌─────────────────────────────────────────────────────────┐
-// │  🔧 CONFIGURAÇÃO                                        │
-// └─────────────────────────────────────────────────────────┘
-const SUPABASE_URL = 'https://fsgdsrdgocaokmuifzpm.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZzZ2RzcmRnb2Nhb2ttdWlmenBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MjI4NTEsImV4cCI6MjA4OTQ5ODg1MX0.vlx8wF4bs2WR8kOMhS3qtqMw-dDY-yK_xR8oRmVcCN4';
+<!-- ══ SCRIPTS ══ -->
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="app.js"></script>
 
-const TIPOS = {
-  pilsen:   { label: 'Pilsen',   emoji: '🟡', cls: 'pilsen' },
-  pale_ale: { label: 'Pale Ale', emoji: '🟢', cls: 'pale_ale' },
-  red:      { label: 'Red',      emoji: '🔴', cls: 'red' },
-};
-const CONSIG_STATUS = {
-  pendente:        '🟣 Pendente',
-  usado:           '✅ Usado',
-  devolvido:       '↩️ Devolvido',
-  nao_requisitado: '— Não Requisitado',
-};
-
-let db, orders = [], producoes = [];
-let currentFilter = 'todos', viewingId = null, editingId = null, estTipoContext = null;
-
-// ═══ INIT ═══════════════════════════════════════════════
-async function init() {
-  db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  const { data: { session } } = await db.auth.getSession();
-  if (session) showApp(session.user);
-  db.auth.onAuthStateChange((ev, session) => {
-    if (ev === 'SIGNED_IN'  && session) showApp(session.user);
-    if (ev === 'SIGNED_OUT')            showLogin();
-  });
-}
-
-// ═══ AUTH ════════════════════════════════════════════════
-async function doLogin() {
-  const email = document.getElementById('loginEmail').value.trim();
-  const pass  = document.getElementById('loginPassword').value;
-  if (!email || !pass) { showLoginError('Preencha e-mail e senha.'); return; }
-  const btn = document.getElementById('loginBtn');
-  btn.disabled = true; btn.textContent = 'Entrando...';
-  document.getElementById('loginError').classList.remove('show');
-  const { error } = await db.auth.signInWithPassword({ email, password: pass });
-  btn.disabled = false; btn.textContent = 'Entrar';
-  if (error) showLoginError('E-mail ou senha incorretos.');
-}
-async function doLogout() {
-  if (!confirm('Sair da conta?')) return;
-  await db.auth.signOut();
-}
-function showLoginError(msg) {
-  const el = document.getElementById('loginError');
-  el.textContent = msg; el.classList.remove('show');
-  void el.offsetWidth; el.classList.add('show');
-}
-function showApp(user) {
-  document.getElementById('loginScreen').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-  const email = user.email || '';
-  document.getElementById('userAvatar').textContent = email.charAt(0).toUpperCase();
-  document.getElementById('userEmail').textContent  = email.split('@')[0];
-  loadData();
-}
-function showLogin() {
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('loginScreen').style.display = 'flex';
-  document.getElementById('loginEmail').value = '';
-  document.getElementById('loginPassword').value = '';
-}
-
-// ═══ DATA ════════════════════════════════════════════════
-async function loadData() {
-  try {
-    await Promise.all([fetchOrders(), fetchEstoque()]);
-    setConn('online');
-    db.channel('v3-changes')
-      .on('postgres_changes', { event:'*', schema:'public', table:'pedidos' },          () => fetchOrders())
-      .on('postgres_changes', { event:'*', schema:'public', table:'pedido_itens' },     () => fetchOrders())
-      .on('postgres_changes', { event:'*', schema:'public', table:'estoque_producao' }, () => fetchEstoque())
-      .subscribe();
-  } catch(e) { setConn('offline'); console.error(e); }
-}
-
-async function fetchOrders() {
-  const { data, error } = await db
-    .from('pedidos')
-    .select('*, pedido_itens(*)')
-    .order('data', { ascending: false })
-    .order('id',   { ascending: false });
-  if (error) { console.error(error); return; }
-  orders = data || [];
-  render(); updateStats(); updateMonth();
-}
-
-async function fetchEstoque() {
-  const { data, error } = await db
-    .from('estoque_producao')
-    .select('*')
-    .order('criado_em', { ascending: false });
-  if (error) { console.error(error); return; }
-  producoes = data || [];
-  renderEstoque();
-}
-
-// ═══ ESTOQUE CARDS ════════════════════════════════════════
-function calcEstoqueByTipo(tipo) {
-  const produzido = producoes
-    .filter(p => p.tipo === tipo)
-    .reduce((s, p) => s + (p.litros || 0), 0);
-
-  const consumido = orders.reduce((s, o) => {
-    return s + (o.pedido_itens || []).reduce((si, it) => {
-      if (it.tipo !== tipo) return si;
-      let c = 0;
-      if (o.status === 'realizado') c += (it.litros || 0);
-      if (it.litros_consignado && it.status_consignado === 'usado') c += it.litros_consignado;
-      return si + c;
-    }, 0);
-  }, 0);
-
-  const now = new Date(), mes = now.getMonth(), ano = now.getFullYear();
-  const comprometido = orders.reduce((s, o) => {
-    if (!o.data) return s;
-    const d = new Date(o.data + 'T12:00:00');
-    if (d.getMonth() !== mes || d.getFullYear() !== ano) return s;
-    return s + (o.pedido_itens || []).reduce((si, it) => {
-      if (it.tipo !== tipo) return si;
-      let c = 0;
-      if (o.status === 'pendente' || o.status === 'confirmar') c += (it.litros || 0);
-      if (it.litros_consignado && it.status_consignado === 'pendente') c += it.litros_consignado;
-      return si + c;
-    }, 0);
-  }, 0);
-
-  const total  = produzido - consumido;
-  const livre  = total - comprometido;
-  const pct    = total > 0 ? Math.max(0, Math.min(100, (livre / total) * 100)) : 0;
-  const danger = livre < 0 || pct < 15;
-  const warn   = !danger && pct < 35;
-  return { total, comprometido, livre, pct, danger, warn };
-}
-
-function renderEstoque() {
-  const grid = document.getElementById('estoqueGrid');
-  grid.innerHTML = Object.entries(TIPOS).map(([tipo, meta]) => {
-    const { total, comprometido, livre, pct, danger, warn } = calcEstoqueByTipo(tipo);
-    const freeClass = danger ? 'danger' : warn ? 'warn' : 'safe';
-    const barClass  = danger ? 'danger' : warn ? 'warn' : meta.cls;
-    return `
-    <div class="est-card ${meta.cls}">
-      <div class="est-card-header">
-        <span class="est-type-badge ${meta.cls}">${meta.emoji} ${meta.label}</span>
-        <button class="est-add-btn" onclick="openEstoqueModal('${tipo}')">+ Produção</button>
-      </div>
-      <div class="est-nums">
-        <div class="est-num-block">
-          <div class="est-num-val gold">${total}L</div>
-          <div class="est-num-lbl">Total</div>
-        </div>
-        <div class="est-num-block">
-          <div class="est-num-val warn">${comprometido}L</div>
-          <div class="est-num-lbl">Comprom.</div>
-        </div>
-        <div class="est-num-block">
-          <div class="est-num-val ${freeClass}">${livre}L</div>
-          <div class="est-num-lbl">Livre</div>
-        </div>
-      </div>
-      <div class="est-bar-track">
-        <div class="est-bar-fill ${barClass}" style="width:${pct}%"></div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ═══ RENDER TABLE ════════════════════════════════════════
-function render() {
-  const q = document.getElementById('searchInput').value.toLowerCase();
-  const rows = orders.filter(o => {
-    const matchQ = !q || o.cliente.toLowerCase().includes(q) || (o.nota||'').toLowerCase().includes(q) || (o.endereco||'').toLowerCase().includes(q);
-    const matchF = currentFilter === 'todos' || o.status === currentFilter;
-    return matchQ && matchF;
-  });
-
-  const tbody = document.getElementById('tbody');
-  const msg   = document.getElementById('centerMsg');
-
-  if (!rows.length) {
-    tbody.innerHTML = '';
-    msg.style.display = 'block';
-    msg.innerHTML = '<div class="icon">🍺</div><p>Nenhum pedido encontrado</p>';
-    return;
-  }
-  msg.style.display = 'none';
-
-  tbody.innerHTML = rows.map(o => {
-    const itens = o.pedido_itens || [];
-    const tiposPills = itens.map(it =>
-      `<span class="tipo-pill tp-${it.tipo}">${TIPOS[it.tipo]?.emoji} ${it.litros ? it.litros+'L' : ''} ${TIPOS[it.tipo]?.label}</span>`
-    ).join('');
-    const totalL = itens.reduce((s, it) => s + (it.litros || 0), 0);
-
-    return `
-    <tr class="row" onclick="openView(${o.id})">
-      <td><span class="date-cell">${fmtDate(o.data)}</span></td>
-      <td>
-        <div class="client-name">${esc(o.cliente)}</div>
-        ${o.endereco ? `<div class="client-sub">📍 ${esc(o.endereco)}</div>` : ''}
-      </td>
-      <td>
-        <div style="display:flex;flex-wrap:wrap;gap:2px;align-items:center">
-          ${tiposPills || '<span class="muted">—</span>'}
-        </div>
-        ${totalL ? `<div style="font-size:11px;color:var(--text-muted);margin-top:3px;font-family:var(--font-label)">Total: ${totalL}L</div>` : ''}
-      </td>
-      <td>${statusBadge(o.status)}</td>
-      <td>${o.chopeira ? '<span class="chopeira-icon" title="Leva chopeira">🍺</span>' : '<span class="muted">—</span>'}</td>
-      <td>${o.valor ? `<span class="valor-cell">R$ ${parseFloat(o.valor).toFixed(2).replace('.',',')}</span>` : '<span class="muted">—</span>'}</td>
-      <td>${o.horario ? `<span class="time-tag">🕐 ${esc(o.horario)}</span>` : '<span class="muted">—</span>'}</td>
-      <td onclick="event.stopPropagation()" style="white-space:nowrap;display:flex;gap:5px;align-items:center;min-height:48px">
-        ${o.status !== 'realizado' ? `<button class="btn btn-sm" onclick="quickDone(${o.id})">✅</button>` : ''}
-        <button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();openEditModal(${o.id})">✏️</button>
-      </td>
-    </tr>`;
-  }).join('');
-}
-
-function updateStats() {
-  const mes = new Date().getMonth(), ano = new Date().getFullYear();
-  const thisMonth = orders.filter(o => {
-    if (!o.data) return false;
-    const d = new Date(o.data + 'T12:00:00');
-    return d.getMonth() === mes && d.getFullYear() === ano;
-  });
-  const totalL = orders.reduce((s,o) => s + (o.pedido_itens||[]).reduce((si,it) => si+(it.litros||0),0), 0);
-  const consigP = orders.reduce((s,o) => s + (o.pedido_itens||[]).filter(it => it.litros_consignado && it.status_consignado==='pendente').reduce((si,it)=>si+(it.litros_consignado||0),0), 0);
-  const valorTotal = thisMonth.reduce((s,o) => s + (parseFloat(o.valor)||0), 0);
-
-  document.getElementById('sTotal').textContent  = orders.length;
-  document.getElementById('sLitros').textContent = totalL + 'L';
-  document.getElementById('sFeitos').textContent = orders.filter(o=>o.status==='realizado').length;
-  document.getElementById('sConsig').textContent = consigP + 'L';
-  document.getElementById('sValor').textContent  = 'R$' + valorTotal.toFixed(0);
-}
-
-function updateMonth() {
-  const dates = orders.map(o=>o.data).filter(Boolean).sort();
-  if (!dates.length) return;
-  const d = new Date(dates[dates.length-1]+'T12:00:00');
-  document.getElementById('hMonth').textContent =
-    d.toLocaleDateString('pt-BR',{month:'long',year:'numeric'}).replace(/^\w/,c=>c.toUpperCase());
-}
-
-function setFilter(f, el) {
-  currentFilter = f;
-  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
-  el.classList.add('active'); render();
-}
-
-// ═══ VIEW MODAL ══════════════════════════════════════════
-function openView(id) {
-  viewingId = id;
-  const o = orders.find(x => x.id === id); if (!o) return;
-  const itens = o.pedido_itens || [];
-
-  document.getElementById('viewTitle').textContent = o.cliente;
-
-  const statusMap = { realizado:'✅ Realizado', pendente:'⏳ Pendente', confirmar:'❓ A Confirmar', desistiu:'❌ Desistiu' };
-
-  let html = `
-    <div class="view-section">
-      <div class="view-section-title">Informações Gerais</div>
-      <div class="view-row"><span class="view-lbl">Data</span><span class="view-val">${fmtDateFull(o.data)}</span></div>
-      <div class="view-row"><span class="view-lbl">Status</span><span class="view-val">${statusBadge(o.status)}</span></div>
-      ${o.endereco ? `<div class="view-row"><span class="view-lbl">Endereço</span><span class="view-val">📍 ${esc(o.endereco)}</span></div>` : ''}
-      ${o.horario  ? `<div class="view-row"><span class="view-lbl">Horário</span><span class="view-val">🕐 ${esc(o.horario)}</span></div>` : ''}
-      <div class="view-row"><span class="view-lbl">Chopeira</span><span class="view-val">${o.chopeira ? '🍺 Sim' : 'Não'}</span></div>
-      ${o.valor    ? `<div class="view-row"><span class="view-lbl">Valor</span><span class="view-val accent">R$ ${parseFloat(o.valor).toFixed(2).replace('.',',')}</span></div>` : ''}
-      ${o.nota     ? `<div class="view-row"><span class="view-lbl">Notas</span><span class="view-val">${esc(o.nota)}</span></div>` : ''}
-    </div>`;
-
-  if (itens.length) {
-    html += `<div class="view-section"><div class="view-section-title">Itens de Chopp</div>`;
-    itens.forEach(it => {
-      const t = TIPOS[it.tipo] || {};
-      html += `
-      <div class="item-card">
-        <div class="item-card-header">
-          <span class="tipo-pill tp-${it.tipo}">${t.emoji} ${t.label}</span>
-          ${it.litros ? `<span style="font-family:var(--font-label);font-weight:700;color:var(--gold-light)">${it.litros}L</span>` : ''}
-        </div>
-        ${it.litros_consignado ? `
-        <div class="item-detail-row">
-          <div class="item-detail-cell"><span class="item-detail-lbl">Consignado</span><span class="item-detail-val">🟣 ${it.litros_consignado}L</span></div>
-          <div class="item-detail-cell"><span class="item-detail-lbl">Status Consig.</span><span class="item-detail-val">${CONSIG_STATUS[it.status_consignado] || '—'}</span></div>
-        </div>` : ''}
-      </div>`;
-    });
-    html += `</div>`;
-
-    const totalL = itens.reduce((s,it)=>s+(it.litros||0),0);
-    const totalC = itens.reduce((s,it)=>s+(it.litros_consignado||0),0);
-    if (totalL || totalC) {
-      html += `<div class="view-row" style="margin-top:4px">
-        <span class="view-lbl">Total Fixo</span>
-        <span class="view-val accent">${totalL}L</span>
-      </div>`;
-      if (totalC) html += `<div class="view-row">
-        <span class="view-lbl">Total Consignado</span>
-        <span class="view-val" style="color:var(--purple)">${totalC}L</span>
-      </div>`;
-    }
-  }
-
-  document.getElementById('viewBody').innerHTML = html;
-  document.getElementById('overlayView').classList.add('open');
-}
-
-function closeView() { document.getElementById('overlayView').classList.remove('open'); viewingId = null; }
-function editFromView()   { const id = viewingId; closeView(); openEditModal(id); }
-function deleteFromView() { const id = viewingId; closeView(); openEditModal(id); setTimeout(deleteOrder, 100); }
-
-// ═══ EDIT MODAL ══════════════════════════════════════════
-function openEditModal(id) {
-  editingId = id || null;
-  document.getElementById('editTitle').textContent    = id ? 'Editar Pedido' : 'Novo Pedido';
-  document.getElementById('editDelBtn').style.display = id ? 'inline-flex' : 'none';
-
-  // Clear item rows
-  document.getElementById('itemRows').innerHTML = '';
-
-  if (id) {
-    const o = orders.find(x => x.id === id); if (!o) return;
-    document.getElementById('fData').value     = o.data || '';
-    document.getElementById('fCliente').value  = o.cliente || '';
-    document.getElementById('fStatus').value   = o.status || 'pendente';
-    document.getElementById('fHorario').value  = o.horario || '';
-    document.getElementById('fNota').value     = o.nota || '';
-    document.getElementById('fEndereco').value = o.endereco || '';
-    document.getElementById('fValor').value    = o.valor || '';
-    document.getElementById('fChopeira').checked = !!o.chopeira;
-    (o.pedido_itens || []).forEach(it => addItemRow(it));
-  } else {
-    document.getElementById('fData').value     = today();
-    document.getElementById('fCliente').value  = '';
-    document.getElementById('fStatus').value   = 'pendente';
-    document.getElementById('fHorario').value  = '';
-    document.getElementById('fNota').value     = '';
-    document.getElementById('fEndereco').value = '';
-    document.getElementById('fValor').value    = '';
-    document.getElementById('fChopeira').checked = false;
-    addItemRow(); // start with one empty item
-  }
-
-  document.getElementById('overlayEdit').classList.add('open');
-  setTimeout(() => document.getElementById('fCliente').focus(), 80);
-}
-
-function closeEdit() { document.getElementById('overlayEdit').classList.remove('open'); editingId = null; }
-
-let itemRowCount = 0;
-function addItemRow(data = null) {
-  const rowId = ++itemRowCount;
-  const container = document.getElementById('itemRows');
-  const div = document.createElement('div');
-  div.className = 'item-row';
-  div.id = 'ir-' + rowId;
-  div.innerHTML = `
-    <div>
-      <div class="item-row-label">Tipo</div>
-      <select class="sel inp-sm" id="ir-tipo-${rowId}" onchange="onItemTipoChange(${rowId})">
-        <option value="pilsen"  ${data?.tipo==='pilsen'  ?'selected':''}>🟡 Pilsen</option>
-        <option value="pale_ale"${data?.tipo==='pale_ale'?'selected':''}>🟢 Pale Ale</option>
-        <option value="red"     ${data?.tipo==='red'     ?'selected':''}>🔴 Red</option>
-      </select>
-    </div>
-    <div>
-      <div class="item-row-label">Litros</div>
-      <input type="number" class="inp inp-sm" id="ir-litros-${rowId}" value="${data?.litros||''}" placeholder="L" min="1">
-    </div>
-    <div>
-      <div class="item-row-label">Consig.</div>
-      <input type="number" class="inp inp-sm" id="ir-consig-${rowId}" value="${data?.litros_consignado||''}" placeholder="L" min="1" oninput="onConsigChange(${rowId})">
-    </div>
-    <div>
-      <div class="item-row-label">St. Consig.</div>
-      <select class="sel inp-sm consig-status-sel ${data?.litros_consignado?'show':''}" id="ir-cstt-${rowId}">
-        <option value="pendente"        ${data?.status_consignado==='pendente'        ?'selected':''}>🟣 Pendente</option>
-        <option value="usado"           ${data?.status_consignado==='usado'           ?'selected':''}>✅ Usado</option>
-        <option value="devolvido"       ${data?.status_consignado==='devolvido'       ?'selected':''}>↩️ Devolvido</option>
-        <option value="nao_requisitado" ${data?.status_consignado==='nao_requisitado' ?'selected':''}>— Não Req.</option>
-      </select>
-    </div>
-    <button class="remove-item-btn" onclick="removeItemRow(${rowId})" title="Remover">✕</button>
-  `;
-  container.appendChild(div);
-}
-
-function removeItemRow(id) {
-  const el = document.getElementById('ir-' + id);
-  if (el) el.remove();
-}
-
-function onItemTipoChange(id) { /* tipo changed, no extra logic needed */ }
-function onConsigChange(id) {
-  const val = document.getElementById('ir-consig-'+id).value;
-  document.getElementById('ir-cstt-'+id).classList.toggle('show', !!val);
-}
-
-function getItemRows() {
-  const rows = document.querySelectorAll('.item-row');
-  return Array.from(rows).map(row => {
-    const id = row.id.replace('ir-','');
-    return {
-      tipo:              document.getElementById('ir-tipo-'+id)?.value,
-      litros:            parseInt(document.getElementById('ir-litros-'+id)?.value)||null,
-      litros_consignado: parseInt(document.getElementById('ir-consig-'+id)?.value)||null,
-      status_consignado: document.getElementById('ir-cstt-'+id)?.value || 'pendente',
-    };
-  }).filter(r => r.tipo);
-}
-
-async function saveOrder() {
-  const cliente = document.getElementById('fCliente').value.trim();
-  if (!cliente) { toast('⚠️ Informe o nome do cliente'); return; }
-
-  const itens = getItemRows();
-  if (!itens.length) { toast('⚠️ Adicione ao menos um tipo de chopp'); return; }
-
-  const pedido = {
-    data:     document.getElementById('fData').value     || null,
-    cliente,
-    status:   document.getElementById('fStatus').value,
-    horario:  document.getElementById('fHorario').value.trim()  || null,
-    nota:     document.getElementById('fNota').value.trim()     || null,
-    endereco: document.getElementById('fEndereco').value.trim() || null,
-    valor:    parseFloat(document.getElementById('fValor').value) || null,
-    chopeira: document.getElementById('fChopeira').checked,
-  };
-
-  setBusy('saveBtn', true);
-  let pedidoId = editingId;
-  let error;
-
-  if (editingId) {
-    ({ error } = await db.from('pedidos').update(pedido).eq('id', editingId));
-    if (!error) {
-      // delete existing items and re-insert
-      await db.from('pedido_itens').delete().eq('pedido_id', editingId);
-    }
-  } else {
-    const { data, error: e } = await db.from('pedidos').insert(pedido).select().single();
-    error = e; if (data) pedidoId = data.id;
-  }
-
-  if (!error && pedidoId) {
-    const itemsToInsert = itens.map(it => ({ ...it, pedido_id: pedidoId }));
-    ({ error } = await db.from('pedido_itens').insert(itemsToInsert));
-  }
-
-  setBusy('saveBtn', false);
-  if (error) { toast('❌ Erro: ' + error.message); return; }
-  toast(editingId ? '✅ Pedido atualizado!' : '🍺 Pedido adicionado!');
-  closeEdit(); await fetchOrders();
-}
-
-async function deleteOrder() {
-  if (!editingId || !confirm('Excluir este pedido?')) return;
-  // pedido_itens are deleted via CASCADE
-  const { error } = await db.from('pedidos').delete().eq('id', editingId);
-  if (error) { toast('❌ Erro ao excluir'); return; }
-  toast('🗑️ Pedido excluído');
-  closeEdit(); await fetchOrders();
-}
-
-async function quickDone(id) {
-  const { error } = await db.from('pedidos').update({ status:'realizado' }).eq('id', id);
-  if (!error) { toast('✅ Realizado!'); await fetchOrders(); }
-}
-
-// ═══ ESTOQUE MODAL ═══════════════════════════════════════
-function openEstoqueModal(tipo) {
-  estTipoContext = tipo;
-  const meta = TIPOS[tipo];
-  document.getElementById('estModalTitle').textContent = `+ Produção — ${meta.label}`;
-  document.getElementById('fEstTipo').value  = tipo;
-  document.getElementById('fEstLitros').value = '';
-  document.getElementById('fEstNota').value   = '';
-
-  const { total, comprometido, livre } = calcEstoqueByTipo(tipo);
-  document.getElementById('estModalInfo').innerHTML = `
-    <div class="est-modal-row"><span>Estoque atual (${meta.label})</span><span>${total}L</span></div>
-    <div class="est-modal-row"><span>Comprometido este mês</span><span>${comprometido}L</span></div>
-    <div class="est-modal-row"><span style="font-weight:600;color:var(--text)">Livre</span><span class="est-modal-total">${livre}L</span></div>
-  `;
-  document.getElementById('overlayEstoque').classList.add('open');
-  setTimeout(() => document.getElementById('fEstLitros').focus(), 80);
-}
-
-function closeEstoqueModal() { document.getElementById('overlayEstoque').classList.remove('open'); estTipoContext = null; }
-
-async function saveEstoque() {
-  const litros = parseInt(document.getElementById('fEstLitros').value);
-  if (!litros || litros < 1) { toast('⚠️ Informe a quantidade'); return; }
-  const tipo = document.getElementById('fEstTipo').value;
-  const nota = document.getElementById('fEstNota').value.trim() || null;
-  setBusy('savEstBtn', true);
-  const { error } = await db.from('estoque_producao').insert({ tipo, litros, nota });
-  setBusy('savEstBtn', false);
-  if (error) { toast('❌ Erro: ' + error.message); return; }
-  toast(`🏭 +${litros}L de ${TIPOS[tipo].label} registrado!`);
-  closeEstoqueModal(); await fetchEstoque();
-}
-
-function openHistorico() {
-  closeEstoqueModal();
-  const list = document.getElementById('historicoList');
-  if (!producoes.length) {
-    list.innerHTML = '<div class="center-msg"><div class="icon">📋</div><p>Nenhum registro ainda</p></div>';
-  } else {
-    list.innerHTML = producoes.map(p => `
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border)">
-        <div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span class="tipo-pill tp-${p.tipo}">${TIPOS[p.tipo]?.emoji} ${TIPOS[p.tipo]?.label}</span>
-            <span style="font-weight:600;color:var(--text)">+${p.litros}L</span>
-          </div>
-          ${p.nota?`<div style="font-size:12px;color:var(--text-muted);font-style:italic;margin-top:4px">${esc(p.nota)}</div>`:''}
-        </div>
-        <div style="font-family:var(--font-label);font-size:12px;color:var(--text-muted)">${fmtDateTime(p.criado_em)}</div>
-      </div>`).join('');
-  }
-  document.getElementById('overlayHistorico').classList.add('open');
-}
-function closeHistorico() { document.getElementById('overlayHistorico').classList.remove('open'); }
-
-// ═══ EXPORT EXCEL ════════════════════════════════════════
-function openExportModal() {
-  const now = new Date();
-  const y = now.getFullYear(), m = String(now.getMonth()+1).padStart(2,'0');
-  document.getElementById('fExportDe').value  = `${y}-${m}-01`;
-  document.getElementById('fExportAte').value = `${y}-${m}-31`;
-  document.getElementById('overlayExport').classList.add('open');
-}
-function closeExport() { document.getElementById('overlayExport').classList.remove('open'); }
-
-function exportExcel() {
-  const de  = document.getElementById('fExportDe').value;
-  const ate = document.getElementById('fExportAte').value;
-
-  let filtered = orders;
-  if (de)  filtered = filtered.filter(o => o.data && o.data >= de);
-  if (ate) filtered = filtered.filter(o => o.data && o.data <= ate);
-
-  if (!filtered.length) { toast('⚠️ Nenhum pedido no período'); return; }
-
-  const rows = filtered.map(o => {
-    const itens = o.pedido_itens || [];
-    const pilsen   = itens.find(it => it.tipo === 'pilsen');
-    const pale_ale = itens.find(it => it.tipo === 'pale_ale');
-    const red      = itens.find(it => it.tipo === 'red');
-    const totalL   = itens.reduce((s,it)=>s+(it.litros||0),0);
-    const totalC   = itens.reduce((s,it)=>s+(it.litros_consignado||0),0);
-
-    return {
-      'Data':               fmtDateFull(o.data),
-      'Cliente':            o.cliente,
-      'Status':             { realizado:'Realizado', pendente:'Pendente', confirmar:'A Confirmar', desistiu:'Desistiu' }[o.status] || o.status,
-      'Endereço':           o.endereco || '',
-      'Chopeira':           o.chopeira ? 'Sim' : 'Não',
-      'Pilsen (L)':         pilsen?.litros || '',
-      'Pale Ale (L)':       pale_ale?.litros || '',
-      'Red (L)':            red?.litros || '',
-      'Total Litros':       totalL || '',
-      'Consig. Pilsen (L)': pilsen?.litros_consignado || '',
-      'Consig. Pale Ale (L)': pale_ale?.litros_consignado || '',
-      'Consig. Red (L)':    red?.litros_consignado || '',
-      'Total Consig.':      totalC || '',
-      'Horário':            o.horario || '',
-      'Valor (R$)':         o.valor ? parseFloat(o.valor).toFixed(2) : '',
-      'Notas':              o.nota || '',
-    };
-  });
-
-  const ws  = XLSX.utils.json_to_sheet(rows);
-  const wb  = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Pedidos');
-
-  // Column widths
-  ws['!cols'] = [
-    {wch:12},{wch:22},{wch:14},{wch:30},{wch:10},
-    {wch:12},{wch:13},{wch:10},{wch:13},
-    {wch:16},{wch:19},{wch:16},{wch:14},
-    {wch:16},{wch:12},{wch:24},
-  ];
-
-  const filename = `berbeck-pedidos${de?'-'+de:''}${ate?'-ate-'+ate:''}.xlsx`;
-  XLSX.writeFile(wb, filename);
-  toast('📊 Excel gerado!');
-  closeExport();
-}
-
-// ═══ HELPERS ═════════════════════════════════════════════
-function statusBadge(s) {
-  const m = { realizado:['b-done','✅ Realizado'], pendente:['b-pending','⏳ Pendente'], confirmar:['b-confirm','❓ A Confirmar'], desistiu:['b-cancel','❌ Desistiu'] };
-  const [cls, lbl] = m[s] || ['b-pending',s];
-  return `<span class="badge ${cls}">${lbl}</span>`;
-}
-function fmtDate(d) { if(!d) return '—'; const [,m,day]=d.split('-'); return `${day}/${m}`; }
-function fmtDateFull(d) { if(!d) return '—'; const [y,m,day]=d.split('-'); return `${day}/${m}/${y}`; }
-function fmtDateTime(iso) { if(!iso) return '—'; const d=new Date(iso); return d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}); }
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function today() { return new Date().toISOString().split('T')[0]; }
-function setConn(s) { const el=document.getElementById('connPill'); el.className='conn-pill '+s; document.getElementById('connLabel').textContent=s==='online'?'Online':'Offline'; }
-function setBusy(id,b) { const btn=document.getElementById(id); btn.disabled=b; btn.textContent=b?'Salvando...':'Salvar'; }
-let _tt;
-function toast(msg) { const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(_tt); _tt=setTimeout(()=>el.classList.remove('show'),2800); }
-
-// ── Keyboard ──
-document.addEventListener('keydown', e => {
-  if (e.key==='Enter' && document.getElementById('loginScreen').style.display!=='none') doLogin();
-  if (e.key==='Escape') { closeView(); closeEdit(); closeEstoqueModal(); closeHistorico(); closeExport(); }
-});
-['overlayView','overlayEdit','overlayEstoque','overlayHistorico','overlayExport'].forEach(id => {
-  document.getElementById(id).addEventListener('click', e => { if(e.target===document.getElementById(id)) document.getElementById(id).classList.remove('open'); });
-});
-
-init();
-</script>
 </body>
 </html>
