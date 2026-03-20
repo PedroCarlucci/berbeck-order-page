@@ -122,7 +122,6 @@ async function fetchOrders() {
   if (error) { console.error(error); return; }
   orders = data || [];
   render();
-  updateStats();
   updateMonth();
   renderEstoque(); // estoque livre depends on orders
 }
@@ -263,11 +262,14 @@ function render() {
         ${totalL ? `<div style="font-size:11px;color:var(--text-muted);margin-top:3px;font-family:var(--font-label)">Total: ${totalL}L</div>` : ''}
       </td>
       <td>${statusBadge(o.status)}</td>
+      <td>${pagoBadge(o.pago)}</td>
       <td>${o.chopeira ? '🍺' : '<span class="muted">—</span>'}</td>
+      <td>${pagoBadge(o.pago)}</td>
       <td>${o.valor ? `<span class="valor-cell">R$ ${parseFloat(o.valor).toFixed(2).replace('.', ',')}</span>` : '<span class="muted">—</span>'}</td>
       <td>${o.horario ? `<span class="time-tag">🕐 ${esc(o.horario)}</span>` : '<span class="muted">—</span>'}</td>
       <td onclick="event.stopPropagation()" style="white-space:nowrap;display:flex;gap:5px;align-items:center;min-height:48px">
         ${o.status !== 'realizado' ? `<button class="btn btn-sm" onclick="quickDone(${o.id})">✅</button>` : ''}
+        ${!o.pago ? `<button class="btn btn-sm btn-ghost" style="border-color:rgba(107,191,122,.4);color:var(--green)" onclick="quickPago(${o.id})" title="Marcar como Pago">💰</button>` : ''}
         <button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();openEditModal(${o.id})">✏️</button>
       </td>
     </tr>`;
@@ -284,15 +286,16 @@ function updateStats() {
     return d.getMonth() === mes && d.getFullYear() === ano;
   });
 
-  const totalL   = orders.reduce((s, o) => s + (o.pedido_itens || []).reduce((si, it) => si + (it.litros || 0), 0), 0);
-  const consigP  = orders.reduce((s, o) => s + (o.pedido_itens || [])
+  // All month-scoped calculations use thisMonth for consistency with the estoque comprometido calc
+  const totalL   = thisMonth.reduce((s, o) => s + (o.pedido_itens || []).reduce((si, it) => si + (it.litros || 0), 0), 0);
+  const consigP  = thisMonth.reduce((s, o) => s + (o.pedido_itens || [])
     .filter(it => it.litros_consignado && it.status_consignado === 'pendente')
     .reduce((si, it) => si + (it.litros_consignado || 0), 0), 0);
   const valorTotal = thisMonth.reduce((s, o) => s + (parseFloat(o.valor) || 0), 0);
 
-  document.getElementById('sTotal').textContent  = orders.length;
+  document.getElementById('sTotal').textContent  = thisMonth.length;
   document.getElementById('sLitros').textContent = totalL + 'L';
-  document.getElementById('sFeitos').textContent = orders.filter(o => o.status === 'realizado').length;
+  document.getElementById('sFeitos').textContent = thisMonth.filter(o => o.status === 'realizado').length;
   document.getElementById('sConsig').textContent = consigP + 'L';
   document.getElementById('sValor').textContent  = 'R$' + valorTotal.toFixed(0);
 }
@@ -686,6 +689,17 @@ function exportExcel() {
 // ═══════════════════════════════════════════════════════════
 //  HELPERS
 // ═══════════════════════════════════════════════════════════
+function pagoBadge(pago) {
+  return pago
+    ? '<span class="badge b-pago">💰 Pago</span>'
+    : '<span class="badge b-npago">⏳ Pendente</span>';
+}
+
+async function quickPago(id) {
+  const { error } = await db.from('pedidos').update({ pago: true }).eq('id', id);
+  if (!error) { toast('💰 Pagamento confirmado!'); await fetchOrders(); }
+}
+
 function statusBadge(s) {
   const m = {
     realizado: ['b-done',    '✅ Realizado'],
@@ -695,6 +709,12 @@ function statusBadge(s) {
   };
   const [cls, lbl] = m[s] || ['b-pending', s];
   return `<span class="badge ${cls}">${lbl}</span>`;
+}
+
+function pagoBadge(pago) {
+  return pago
+    ? `<span class="badge b-done">💰 Pago</span>`
+    : `<span class="badge b-unpaid">Não Pago</span>`;
 }
 
 function fmtDate(d) {
