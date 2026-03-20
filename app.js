@@ -262,8 +262,7 @@ function render() {
         ${totalL ? `<div style="font-size:11px;color:var(--text-muted);margin-top:3px;font-family:var(--font-label)">Total: ${totalL}L</div>` : ''}
       </td>
       <td>${statusBadge(o.status)}</td>
-      <td>${pagoBadge(o.pago)}</td>
-      <td>${o.chopeira ? '🍺' : '<span class="muted">—</span>'}</td>
+      <td>${o.chopeira ? '<span class="badge b-confirm">🍺 Sim</span>' : '<span class="muted">—</span>'}</td>
       <td>${pagoBadge(o.pago)}</td>
       <td>${o.valor ? `<span class="valor-cell">R$ ${parseFloat(o.valor).toFixed(2).replace('.', ',')}</span>` : '<span class="muted">—</span>'}</td>
       <td>${o.horario ? `<span class="time-tag">🕐 ${esc(o.horario)}</span>` : '<span class="muted">—</span>'}</td>
@@ -689,11 +688,6 @@ function exportExcel() {
 // ═══════════════════════════════════════════════════════════
 //  HELPERS
 // ═══════════════════════════════════════════════════════════
-function pagoBadge(pago) {
-  return pago
-    ? '<span class="badge b-pago">💰 Pago</span>'
-    : '<span class="badge b-npago">⏳ Pendente</span>';
-}
 
 async function quickPago(id) {
   const { error } = await db.from('pedidos').update({ pago: true }).eq('id', id);
@@ -713,8 +707,8 @@ function statusBadge(s) {
 
 function pagoBadge(pago) {
   return pago
-    ? `<span class="badge b-done">💰 Pago</span>`
-    : `<span class="badge b-unpaid">Não Pago</span>`;
+    ? `<span class="badge b-done">✅ Pago</span>`
+    : `<span class="badge b-unpaid">⚠️ Não Pago</span>`;
 }
 
 function fmtDate(d) {

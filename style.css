@@ -505,7 +505,7 @@ tr.row:hover td:first-child { box-shadow: inset 3px 0 0 var(--gold); }
 .b-pending { background: rgba(106,170,212,.1); border: 1px solid rgba(106,170,212,.3); color: var(--blue); }
 .b-confirm { background: rgba(201,168,76,.1);  border: 1px solid rgba(201,168,76,.3);  color: var(--gold); }
 .b-cancel  { background: rgba(212,97,74,.08);  border: 1px solid rgba(212,97,74,.25);  color: var(--red); }
-.b-unpaid  { background: rgba(100,80,40,.15);  border: 1px solid rgba(100,80,40,.35);  color: var(--text-muted); }
+.b-unpaid  { background: rgba(212,144,74,.12); border: 1px solid rgba(212,144,74,.35); color: var(--orange); }
 .b-pago    { background: rgba(107,191,122,.1); border: 1px solid rgba(107,191,122,.3); color: var(--green); }
 .b-npago   { background: rgba(212,97,74,.08);  border: 1px solid rgba(212,97,74,.25);  color: var(--red); }
 
